@@ -14,12 +14,18 @@ namespace PhantomRacing
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        // Object reference to GraphicsDevice.
+        private GraphicsDeviceManager graphics;
 
-        public Game1()
+        // Use this to draw stuff on the screen.
+        private SpriteBatch spriteBatch;
+
+        // In game entities
+        private List<GameObject> mEntities = new List<GameObject>();
+
+        public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -33,7 +39,12 @@ namespace PhantomRacing
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            
+            // Initialize all game objects
+            foreach (GameObject go in mEntities)
+            {
+                go.Initialize();
+            }
 
             base.Initialize();
         }
@@ -44,10 +55,8 @@ namespace PhantomRacing
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
         }
 
         /// <summary>
@@ -56,7 +65,6 @@ namespace PhantomRacing
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -66,11 +74,13 @@ namespace PhantomRacing
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            int now = gameTime.ElapsedGameTime.Milliseconds;
 
-            // TODO: Add your update logic here
+            // Updates entities logic
+            foreach (GameObject go in mEntities)
+            {
+                go.Update(now);
+            }
 
             base.Update(gameTime);
         }
@@ -83,7 +93,15 @@ namespace PhantomRacing
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            // Renders all entities in the game
+            foreach (GameObject go in mEntities)
+            {
+                go.Render(spriteBatch);
+            }
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
