@@ -1,0 +1,6 @@
+- Improve bullet spawn (it's currently spawning inside the player object, when it should spawn just after the rifle).
+- Add Game Pad support. 
+- Convert GamePad and Keyboard inputs to a generic interface.
+- Handle objects out of screen.
+- Implement kinect scanning.
+- Implement physics handling.
