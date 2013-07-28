@@ -108,11 +108,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Factory.cs" />
-    <Compile Include="GameObject.cs" />
+    <Compile Include="AssetLoader.cs" />
+    <Compile Include="Bullet.cs" />
+    <Compile Include="BulletComponent.cs" />
     <Compile Include="GameComponent.cs" />
+    <Compile Include="GameObject.cs" />
     <Compile Include="KinectManager.cs" />
     <Compile Include="NoKinectSensorAvailableException.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="PlayerInputComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />

@@ -6,58 +6,103 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PhantomRacing
 {
-    public abstract class GameComponent
+    public class GameComponent
     {
-        // UID of the component
+        // Component id
         private String mId;
 
-        /// <summary>
-        /// Create a game component.
-        /// </summary>
-        /// <param name="id">Unique id of the component.</param>
+        // Component Children
+        private List<GameComponent> mChildren = new List<GameComponent>();
+
         public GameComponent(String id)
         {
             mId = id;
         }
 
-        /// <summary>
-        /// Retrieves the id from this component.
-        /// </summary>
-        /// <returns>A string containing the id.</returns>
         public String GetId()
         {
             return mId;
         }
 
-        /// <summary>
-        /// Initialization routine. Here we initialize
-        /// the internals of the component.
-        /// </summary>
         public virtual void Initialize()
         {
+            foreach (GameComponent g in mChildren)
+            {
+                g.Initialize();
+            }
         }
 
-        /// <summary>
-        /// Update the component logic here.
-        /// </summary>
-        /// <param name="deltaTime">Elapsed time since last frame.</param>
-        public virtual void Update(int deltaTime)
+        public virtual void Update(float timeStep)
         {
+            foreach (GameComponent g in mChildren)
+            {
+                g.Update(timeStep);
+            }
         }
 
-        /// <summary>
-        /// Renders to the screen;
-        /// </summary>
         public virtual void Render(SpriteBatch spriteBatch)
         {
+            foreach (GameComponent g in mChildren)
+            {
+                g.Render(spriteBatch);
+            }
+        }
+
+        public virtual void Shutdown()
+        {
+            foreach (GameComponent g in mChildren)
+            {
+                g.Shutdown();
+            }
         }
 
         /// <summary>
-        /// Free unused resources. After calling this method,
-        /// the component will become unusable.
+        /// Add a new component to this object.
         /// </summary>
-        public virtual void Shutdown()
+        /// <param name="go">The new component.</param>
+        /// <returns>An instance of this object.</returns>
+        public GameComponent AddComponent(GameComponent g)
         {
+            mChildren.Add(g);
+            return this;
+        }
+
+        /// <summary>
+        /// Removes a component owned by this object.
+        /// </summary>
+        /// <param name="id">The id of the object.</param>
+        /// <returns>An instance of this object.</returns>
+        public GameComponent RemoveComponent(String id)
+        {
+            foreach (GameComponent g in mChildren)
+            {
+                if (id.CompareTo(g.GetId()) == 0)
+                {
+                    mChildren.Remove(g);
+                    break;
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Retrieves a child of this object.
+        /// </summary>
+        /// <param name="id">Child id.</param>
+        /// <returns>A reference to the child if found.
+        /// Null otherwise.</returns>
+        public GameComponent GetComponent(String id)
+        {
+            foreach (GameComponent g in mChildren)
+            {
+                if (id.CompareTo(g.GetId()) == 0)
+                {
+                    return g;
+                }
+            }
+
+            return null;
         }
     }
 }

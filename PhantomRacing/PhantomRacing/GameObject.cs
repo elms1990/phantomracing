@@ -6,85 +6,111 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PhantomRacing
 {
-    public class GameObject : GameComponent
+    public class GameObject
     {
-        // Components assigned to this object.
-        private LinkedList<GameComponent> mComponents = new LinkedList<GameComponent>();
+        // Children component list
+        private List<GameComponent> mChildren = new List<GameComponent>();
 
-        public GameObject(String id) : base(id)
+        // Object ID
+        private String mId;
+
+        /// <summary>
+        /// GameObject constructor.
+        /// </summary>
+        /// <param name="id">Object id so it can be retrieved.</param>
+        public GameObject(String id)
         {
+            mId = id;
         }
 
         /// <summary>
-        /// Initialize the game object.
+        /// Gets the object id.
         /// </summary>
-        public override void Initialize()
+        /// <returns></returns>
+        public String GetId()
         {
-            foreach (GameComponent gc in mComponents)
+            return mId;
+        }
+
+        /// <summary>
+        /// Sets the object id.
+        /// </summary>
+        /// <param name="id">A new id.</param>
+        public void SetId(String id)
+        {
+            mId = id;
+        }
+
+        /// <summary>
+        /// Initialize this object.
+        /// </summary>
+        public virtual void Initialize()
+        {
+            foreach (GameComponent g in mChildren)
             {
-                gc.Initialize();
+                g.Initialize();
             }
         }
 
         /// <summary>
-        /// 
+        /// Update the game logic of this object.
         /// </summary>
-        /// <param name="deltaTime"></param>
-        public override void Update(int deltaTime)
+        /// <param name="timeStep"></param>
+        public virtual void Update(float timeStep)
         {
-            foreach (GameComponent gc in mComponents)
+            foreach (GameComponent g in mChildren)
             {
-                gc.Update(deltaTime);
+                g.Update(timeStep);
             }
         }
 
         /// <summary>
         /// Renders this object to the screen.
         /// </summary>
-        public override void Render(SpriteBatch spriteBatch)
+        /// <param name="spriteBatch">Graphics object used to draw.</param>
+        public virtual void Render(SpriteBatch spriteBatch)
         {
-            foreach (GameComponent gc in mComponents)
+            foreach (GameComponent g in mChildren)
             {
-                gc.Render(spriteBatch);
+                g.Render(spriteBatch);
             }
         }
 
         /// <summary>
-        /// Releases resources used by this object.
+        /// Disposes this object. After calling this method,
+        /// this object becomes unreliable.
         /// </summary>
-        public override void Shutdown()
+        public virtual void Shutdown()
         {
-            foreach (GameComponent gc in mComponents)
+            foreach (GameComponent g in mChildren)
             {
-                gc.Shutdown();
+                g.Shutdown();
             }
-
-            mComponents.Clear();
         }
 
         /// <summary>
         /// Add a new component to this object.
         /// </summary>
-        /// <param name="component">A game component.</param>
-        /// <returns>This object's reference.</returns>
-        public GameObject AddComponent(GameComponent component)
+        /// <param name="go">The new component.</param>
+        /// <returns>An instance of this object.</returns>
+        public GameObject AddComponent(GameComponent g)
         {
-            mComponents.AddLast(component);
+            mChildren.Add(g);
             return this;
         }
 
         /// <summary>
-        /// Remove a game component from this object.
+        /// Removes a component owned by this object.
         /// </summary>
-        /// <param name="id">The component id.</param>
-        /// <returns>This objects reference.</returns>
+        /// <param name="id">The id of the object.</param>
+        /// <returns>An instance of this object.</returns>
         public GameObject RemoveComponent(String id)
         {
-            foreach (GameComponent gc in mComponents)
+            foreach (GameComponent g in mChildren)
             {
-                if (gc.GetId() == id)
+                if (id.CompareTo(g.GetId()) == 0)
                 {
-                    mComponents.Remove(gc);
+                    mChildren.Remove(g);
                     break;
                 }
             }
@@ -93,22 +119,22 @@ namespace PhantomRacing
         }
 
         /// <summary>
-        /// Retrieves a GameComponent in this object.
+        /// Retrieves a child of this object.
         /// </summary>
-        /// <param name="id">The id of the component.</param>
-        /// <returns>The component, if it is a child of
-        /// this component. Null, otherwise.
-        /// </returns>
-        public T GetComponent<T> (String id) where T : GameComponent
+        /// <param name="id">Child id.</param>
+        /// <returns>A reference to the child if found.
+        /// Null otherwise.</returns>
+        public GameComponent GetComponent(String id)
         {
-            foreach (GameComponent gc in mComponents)
+            foreach (GameComponent g in mChildren)
             {
-                if (gc.GetId().CompareTo(id) == 0)
+                if (id.CompareTo(g.GetId()) == 0)
                 {
-                    return (T)gc;
+                    return g;
                 }
             }
-            return (T)null;
+
+            return null;
         }
     }
 }

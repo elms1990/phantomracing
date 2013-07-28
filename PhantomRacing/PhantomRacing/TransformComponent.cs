@@ -8,21 +8,18 @@ namespace PhantomRacing
 {
     public class TransformComponent : GameComponent
     {
-        // Position of the object
-        public Vector2 Position;
+        // Object position, in pixel coordinates
+        public Vector2 Position = new Vector2(0);
 
-        // Scale vector of the object
-        public Vector2 Scale;
+        // Scaling factor
+        public Vector2 Scale = new Vector2(1);
 
-        // Angle of Rotation
-        public float Rotation;
+        // Angle of rotation relative to its center.
+        public float Rotation = 0;
 
         public TransformComponent()
             : base("Transform")
         {
-            Position = new Vector2(0);
-            Scale = new Vector2(1);
-            Rotation = 0;
         }
     }
 }

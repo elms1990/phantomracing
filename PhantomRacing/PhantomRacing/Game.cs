@@ -22,8 +22,8 @@ namespace PhantomRacing
         // Use this to draw stuff on the screen.
         private SpriteBatch spriteBatch;
 
-        // In game entities
-        private List<GameObject> mEntities = new List<GameObject>();
+        // Playerlist
+        private Player[] mPlayers = new Player[4];
 
         public Game()
         {
@@ -39,14 +39,21 @@ namespace PhantomRacing
         /// </summary>
         protected override void Initialize()
         {
-            
-            // Initialize all game objects
-            foreach (GameObject go in mEntities)
-            {
-                go.Initialize();
-            }
-
             base.Initialize();
+
+            // Initialize AssetLoader
+            AssetLoader.CreateInstance(Content);
+            
+            // Allocate players
+            for (int i = 0; i < mPlayers.Length; i++)
+            {
+                mPlayers[i] = new Player();
+                mPlayers[i].AddComponent(new TransformComponent()).
+                    AddComponent(new PlayerInputComponent(mPlayers[i])).
+                    AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player")));
+                mPlayers[i].Index = (PlayerIndex)(i + 1);
+                mPlayers[i].Initialize();
+            }
         }
 
         /// <summary>
@@ -74,14 +81,10 @@ namespace PhantomRacing
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            int now = gameTime.ElapsedGameTime.Milliseconds;
-
-            // Updates entities logic
-            foreach (GameObject go in mEntities)
+            for (int i = 0; i < mPlayers.Length; i++)
             {
-                go.Update(now);
+                mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             }
-
             base.Update(gameTime);
         }
 
@@ -94,13 +97,10 @@ namespace PhantomRacing
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-
-            // Renders all entities in the game
-            foreach (GameObject go in mEntities)
+            for (int i = 0; i < mPlayers.Length; i++)
             {
-                go.Render(spriteBatch);
+                mPlayers[i].Render(spriteBatch);
             }
-
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -9,57 +9,61 @@ namespace PhantomRacing
 {
     public class RenderComponent : GameComponent
     {
-        // A reference to the owner of this game component.
+        // Parent reference
         private GameObject mParent;
 
-        // Reference to parent's TransformComponent.
+        // Parent transform reference
         private TransformComponent mTransform;
 
-        // Object's texture
-        private Texture2D mTexture;
+        // Objects texture
+        private Texture2D mTexture = null;
 
-        // Object's point of rotation
-        private Vector2 mCenter = new Vector2(0);
+        // Bounding rectangle
+        private Rectangle mRectangle = new Rectangle();
 
-        // Destiny rectangle
-        private Rectangle mDestiny = new Rectangle();
+        // Center of object
+        public Vector2 Center = new Vector2();
 
         public RenderComponent(GameObject parent, Texture2D texture)
             : base("Render")
         {
-            mParent = parent;
             mTexture = texture;
+            mParent = parent;
+        }
+
+        public int GetWidth()
+        {
+            return mTexture.Width;
+        }
+
+        public int GetHeight()
+        {
+            return mTexture.Height;
         }
 
         public override void Initialize()
         {
-            mTransform = mParent.GetComponent<TransformComponent>("Transform");
+            mTransform = (TransformComponent)mParent.GetComponent("Transform");
         }
 
-        public override void Update(int deltaTime)
+        public override void Update(float timeStep)
         {
-            // Update center coordinates
-            mCenter.X = (mTexture.Width * mTransform.Scale.X)/2;
-            mCenter.Y = (mTexture.Height * mTransform.Scale.Y)/2;
+            // Update rotating axis position
+            Center.X = mTexture.Width / 2;
+            Center.Y = mTexture.Height / 2;
 
-            // Apply rotation and scaling 
-            mDestiny.X = (int) (mTransform.Position.X + mCenter.X);
-            mDestiny.Y = (int) (mTransform.Position.Y + mCenter.Y);
-            mDestiny.Width = (int) (mTexture.Width * mTransform.Scale.X);
-            mDestiny.Height = (int) (mTexture.Height * mTransform.Scale.Y);
+            // Update body position
+            mRectangle.X = (int)(mTransform.Position.X + (2 * Center.X * mTransform.Scale.X) / 2);
+            mRectangle.Y = (int)(mTransform.Position.Y + (2 * Center.Y * mTransform.Scale.Y) / 2);
+            mRectangle.Width = (int)(2 * Center.X * mTransform.Scale.X);
+            mRectangle.Height = (int)(2 * Center.Y * mTransform.Scale.Y);
         }
 
         public override void Render(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(mTexture, mDestiny, null, Color.White, mTransform.Rotation,
-                mCenter, SpriteEffects.None, 0);
-        }
-
-        public override void Shutdown()
-        {
-            mParent = null;
-            mTransform = null;
-            mTexture = null;
+            // Draw body
+            spriteBatch.Draw(mTexture, mRectangle, null, Color.White,
+                mTransform.Rotation, Center, SpriteEffects.None, 0);
         }
     }
 }
