@@ -41,6 +41,7 @@ namespace PhantomRacing
 
         public override void Shutdown()
         {
+            base.Shutdown();
         }
     }
 }
