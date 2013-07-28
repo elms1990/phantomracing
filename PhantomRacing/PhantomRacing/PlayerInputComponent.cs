@@ -30,7 +30,6 @@ namespace PhantomRacing
             : base("PlayerInput")
         {
             mParent = parent;
-            AddComponent(new BulletComponent(mParent));
         }
 
         public override void Initialize()
@@ -38,7 +37,7 @@ namespace PhantomRacing
             base.Initialize();
 
             mTransform = (TransformComponent)mParent.GetComponent("Transform");
-            mBullet = (BulletComponent)GetComponent("Bullet");
+            mBullet = (BulletComponent)mParent.GetComponent("Bullet");
         }
 
         public override void Update(float timeStep)

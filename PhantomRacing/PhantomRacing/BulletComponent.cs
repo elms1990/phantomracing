@@ -21,6 +21,9 @@ namespace PhantomRacing
         // Parent Render
         private RenderComponent mParentRender;
 
+        // Remove list
+        private LinkedList<Bullet> mRemove = new LinkedList<Bullet>();
+
         public BulletComponent(GameObject parent)
             : base("Bullet")
         {
@@ -37,6 +40,14 @@ namespace PhantomRacing
 
         public override void Update(float timeStep)
         {
+            // Clean bullets that are no longer used
+            foreach (Bullet b in mRemove)
+            {
+                b.Shutdown();
+                mBullets.Remove(b);
+            }
+            mRemove.Clear();
+
             foreach (Bullet b in mBullets)
             {
                 b.Update(timeStep);
@@ -51,16 +62,30 @@ namespace PhantomRacing
             }
         }
 
+        /// <summary>
+        /// Spawn projectile in the world.
+        /// </summary>
         public void SpawnBullet()
         {
-            Bullet b = new Bullet((float)(mParentTransform.Position.X + 
-                mParentRender.GetWidth() / 2),
-                (float)(mParentTransform.Position.Y + 
-                mParentRender.GetHeight() / 2), mParentTransform.Rotation);
-            b.AddComponent(new TransformComponent()).
-                AddComponent(new RenderComponent(b, AssetLoader.GetInstance().LoadAsset<Texture2D>("bullet")));
+            Bullet b = new Bullet(this);
+            TransformComponent tc = new TransformComponent();
+            RenderComponent rc = new RenderComponent(b, AssetLoader.GetInstance().LoadAsset<Texture2D>("bullet"));
+            b.AddComponent(tc).
+                AddComponent(rc);
+            tc.Position.X = (float)(mParentTransform.Position.X + mParentRender.GetWidth() / 2 - rc.GetWidth() / 2);
+            tc.Position.Y = (float)(mParentTransform.Position.Y + mParentRender.GetHeight() / 2 - rc.GetHeight() / 2);
+            tc.Rotation = mParentTransform.Rotation;
             b.Initialize();
             mBullets.Add(b);
+        }
+
+        /// <summary>
+        /// Mark a bullet for removal on next update.
+        /// </summary>
+        /// <param name="b">Bullet to be removed.</param>
+        public void MarkRemoval(Bullet b)
+        {
+            mRemove.AddLast(b);
         }
     }
 }

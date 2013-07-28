@@ -23,7 +23,7 @@ namespace PhantomRacing
         private SpriteBatch spriteBatch;
 
         // Playerlist
-        private Player[] mPlayers = new Player[4];
+        private Player[] mPlayers = new Player[1];
 
         public Game()
         {
@@ -43,6 +43,9 @@ namespace PhantomRacing
 
             // Initialize AssetLoader
             AssetLoader.CreateInstance(Content);
+
+            // Initialize Viewport
+            Viewport.CreateInstance(graphics.GraphicsDevice);
             
             // Allocate players
             for (int i = 0; i < mPlayers.Length; i++)
@@ -50,6 +53,7 @@ namespace PhantomRacing
                 mPlayers[i] = new Player();
                 mPlayers[i].AddComponent(new TransformComponent()).
                     AddComponent(new PlayerInputComponent(mPlayers[i])).
+                    AddComponent(new BulletComponent(mPlayers[i])).
                     AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player")));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
                 mPlayers[i].Initialize();

@@ -121,6 +121,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="RenderComponent.cs" />
     <Compile Include="TransformComponent.cs" />
+    <Compile Include="Viewport.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

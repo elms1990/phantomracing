@@ -18,18 +18,12 @@ namespace PhantomRacing
         // Render Component
         private RenderComponent mRender;
 
-        // Angle of displacement
-        private float mRotation = 0;
+        // Parent Component
+        private BulletComponent mParent;
 
-        // Starting position of this bullet
-        private float mStartingX;
-        private float mStartingY;
-
-        public Bullet(float x, float y, float rotation) : base("Bullet")
+        public Bullet(BulletComponent parent) : base("Bullet")
         {
-            mRotation = rotation;
-            mStartingX = x;
-            mStartingY = y;
+            mParent = parent;
         }
 
         public override void Initialize()
@@ -39,14 +33,10 @@ namespace PhantomRacing
             // Gets the reference of transform and render components
             mTransform = (TransformComponent)GetComponent("Transform");
             mRender = (RenderComponent)GetComponent("Render");
-
-            // Update starting position
-            mTransform.Position.X = mStartingX;
-            mTransform.Position.Y = mStartingY;
             
             // Update speed vector
-            Speed.X = - (float)(Speed.X * Math.Sin(mRotation));
-            Speed.Y = (float)(Speed.Y * Math.Cos(mRotation));
+            Speed.X = - (float)(Speed.X * Math.Sin(mTransform.Rotation));
+            Speed.Y = (float)(Speed.Y * Math.Cos(mTransform.Rotation));
         }
 
         public override void Update(float timeStep)
@@ -56,13 +46,12 @@ namespace PhantomRacing
             mTransform.Position.X += timeStep * Speed.X;
             mTransform.Position.Y += timeStep * Speed.Y;
 
-            //// Remove bullet.
-            //if (Position.X < 0 || Position.X > Game.graphics.GraphicsDevice.Viewport.Width ||
-            //    Position.Y < 0 || Position.Y > Game.graphics.GraphicsDevice.Viewport.Height)
-            //{
-            //    Parent.RemoveBullet(this);
-            //    Shutdown();
-            //}
+            // Remove bullet if out of screen.
+            if (mTransform.Position.X < 0 || mTransform.Position.X > Viewport.GetInstance().GetWidth() ||
+                mTransform.Position.Y < 0 || mTransform.Position.Y > Viewport.GetInstance().GetHeight())
+            {
+                mParent.MarkRemoval(this);
+            }
         }
 
         public override void Render(SpriteBatch spriteBatch)
@@ -70,9 +59,12 @@ namespace PhantomRacing
             base.Render(spriteBatch);
         }
 
-    //    public override void Shutdown()
-    //    {
-    //        mBodyTexture = null;;
-    //    }
+        public override void Shutdown()
+        {
+            base.Shutdown();
+            mTransform = null;
+            mParent = null;
+            mRender = null;
+        }
     }
 }
