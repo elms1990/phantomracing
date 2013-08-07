@@ -9,19 +9,31 @@ namespace PhantomRacing
 {
     public class KeyboardHandler : IInput
     {
+        // Old keyboard state
         private InputState mOldState = null; 
+
+        // New keyboard state
         private InputState mNewState = new InputState();
 
+        // Individual key states
         private LinkedList<String> mPressed, mJustPressed, mReleased, mJustReleased;
 
+        // Mapped keys
         private Dictionary<string, Keys> mMapped = new Dictionary<string, Keys>();
 
+        // Singleton instance
         private static KeyboardHandler sInstance = null;
 
+        /// <summary>
+        /// Hidden constructor.
+        /// </summary>
         private KeyboardHandler()
         {
         }
 
+        /// <summary>
+        /// Create a singleton instance of this class.
+        /// </summary>
         public static void CreateInstance()
         {
             if (sInstance == null)
@@ -30,16 +42,27 @@ namespace PhantomRacing
             }
         }
 
+        /// <summary>
+        /// Retrieves the singleton instance of this class.
+        /// </summary>
+        /// <returns>Singleton instance.</returns>
         public static KeyboardHandler GetInstance()
         {
             return sInstance;
         }
 
+        /// <summary>
+        /// Retrieves the state of this keyboard.
+        /// </summary>
+        /// <returns>Current state.</returns>
         public InputState GetState()
         {
             return mNewState;
         }
 
+        /// <summary>
+        /// Updates all mapped keys.
+        /// </summary>
         public void Update()
         {
             KeyboardState curState = Keyboard.GetState();
@@ -90,6 +113,12 @@ namespace PhantomRacing
                 new LinkedList<KeyValuePair<string, Vector3>>());
         }
 
+        /// <summary>
+        /// Adds a new key to the mapping.
+        /// </summary>
+        /// <param name="id">Id of the virtual key.</param>
+        /// <param name="button">Physical key.</param>
+        /// <returns>An instance of this class.</returns>
         public IInput Map(string id, Object button)
         {
             mMapped.Add(id, (Keys)button);
@@ -97,6 +126,10 @@ namespace PhantomRacing
             return sInstance;
         }
 
+        /// <summary>
+        /// Removes a key from mapping.
+        /// </summary>
+        /// <param name="id">Virtual key id.</param>
         public void Unmap(string id)
         {
             mMapped.Remove(id);
