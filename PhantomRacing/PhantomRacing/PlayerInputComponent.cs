@@ -45,32 +45,33 @@ namespace PhantomRacing
             base.Update(timeStep);
 
             // Input update
-            KeyboardState ks = Keyboard.GetState();
-            if (ks.IsKeyDown(Keys.A))
+            //KeyboardState ks = Keyboard.GetState();
+            InputState ks = KeyboardHandler.GetInstance().GetState();
+            if (ks.IsPressed("left"))
             {
                 mTransform.Position.X -= mParent.Speed.X * timeStep;
             }
-            if (ks.IsKeyDown(Keys.D))
+            if (ks.IsPressed("right"))
             {
                 mTransform.Position.X += mParent.Speed.X * timeStep;
             }
-            if (ks.IsKeyDown(Keys.W))
+            if (ks.IsPressed("up"))
             {
                 mTransform.Position.Y -= mParent.Speed.Y * timeStep;
             }
-            if (ks.IsKeyDown(Keys.S))
+            if (ks.IsPressed("down"))
             {
                 mTransform.Position.Y += mParent.Speed.Y * timeStep;
             }
-            if (ks.IsKeyDown(Keys.Left))
+            if (ks.IsPressed("rleft"))
             {
                 mTransform.Rotation -= mParent.RotationSpeed * timeStep;
             }
-            if (ks.IsKeyDown(Keys.Right))
+            if (ks.IsPressed("rright"))
             {
                 mTransform.Rotation += mParent.RotationSpeed * timeStep;
             }
-            if (ks.IsKeyDown(Keys.Up) && !mShot)
+            if (ks.IsPressed("shoot") && !mShot)
             {
                 mBullet.SpawnBullet();
                 mShot = true;

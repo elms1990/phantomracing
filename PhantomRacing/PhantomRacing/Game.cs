@@ -46,6 +46,18 @@ namespace PhantomRacing
 
             // Initialize Viewport
             Viewport.CreateInstance(graphics.GraphicsDevice);
+
+            // Initialize KeyboardHandler
+            KeyboardHandler.CreateInstance();
+
+            // Load default keys for player 1
+            KeyboardHandler.GetInstance().Map("up", Keys.W)
+                .Map("left", Keys.A)
+                .Map("down", Keys.S)
+                .Map("right", Keys.D)
+                .Map("rleft", Keys.Left)
+                .Map("rright", Keys.Right)
+                .Map("shoot", Keys.Up);
             
             // Allocate players
             for (int i = 0; i < mPlayers.Length; i++)
@@ -85,6 +97,8 @@ namespace PhantomRacing
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            KeyboardHandler.GetInstance().Update();
+
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);

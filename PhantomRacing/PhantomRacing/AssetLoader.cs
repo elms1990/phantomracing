@@ -15,7 +15,7 @@ namespace PhantomRacing
         private ContentManager mContentManager = null;
 
         /// <summary>
-        /// Hiden constructor
+        /// Hidden constructor
         /// </summary>
         /// <param name="manager">Asset loader</param>
         private AssetLoader(ContentManager manager)
