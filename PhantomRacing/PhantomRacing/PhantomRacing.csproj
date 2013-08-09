@@ -111,6 +111,7 @@
     <Compile Include="AssetLoader.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="BulletComponent.cs" />
+    <Compile Include="GamePadHandler.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="IInput.cs" />
