@@ -21,6 +21,11 @@ namespace PhantomRacing
             return mId;
         }
 
+        public void SetId(String id)
+        {
+            mId = id;
+        }
+
         public virtual void Initialize()
         {
         }

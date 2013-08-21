@@ -14,7 +14,7 @@ namespace PhantomRacing
         InputState GetState();
 
         /// <summary>
-        /// Updates all mapped buttons.
+        /// Updates the state of all mapped buttons.
         /// </summary>
         void Update();
 

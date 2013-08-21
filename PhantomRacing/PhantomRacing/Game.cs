@@ -28,6 +28,9 @@ namespace PhantomRacing
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 768;
+            //graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
         }
 
@@ -66,7 +69,8 @@ namespace PhantomRacing
                 mPlayers[i].AddComponent(new TransformComponent()).
                     AddComponent(new PlayerInputComponent(mPlayers[i])).
                     AddComponent(new BulletComponent(mPlayers[i])).
-                    AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player")));
+                    AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player"))).
+                    AddComponent(new LifeComponent(mPlayers[i], 100, 75));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
                 mPlayers[i].Initialize();
             }
