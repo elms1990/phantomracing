@@ -112,6 +112,7 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="BulletComponent.cs" />
     <Compile Include="CollisionType.cs" />
+    <Compile Include="Event.cs" />
     <Compile Include="GamePadHandler.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="GameObject.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="RenderComponent.cs" />
     <Compile Include="TransformComponent.cs" />
     <Compile Include="Viewport.cs" />
+    <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

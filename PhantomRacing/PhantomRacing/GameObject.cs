@@ -50,6 +50,8 @@ namespace PhantomRacing
             {
                 g.Initialize();
             }
+
+            World.GetInstance().Add(this);
         }
 
         /// <summary>
@@ -135,6 +137,47 @@ namespace PhantomRacing
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Sends an event message to an object.
+        /// </summary>
+        /// <param name="e">Sending event.</param>
+        public void SendEvent(Event e)
+        {
+            if (e.Sender == null)
+                e.Sender = this;
+            e.Receiver.ReceiveEvent(e);
+        }
+
+        /// <summary>
+        /// Receives an event message and handles it.
+        /// </summary>
+        /// <param name="e">Receiving event.</param>
+        public void ReceiveEvent(Event e)
+        {
+            OnEvent(e);
+        }
+
+        /// <summary>
+        /// This method is called when this object receives an event.
+        /// </summary>
+        /// <param name="e">Received event.</param>
+        protected virtual void OnEvent(Event e)
+        {
+        }
+
+        /// <summary>
+        /// Sends this message to all objects in the game.
+        /// The target field on the struct will be ignored.
+        /// </summary>
+        /// <param name="e">Event message.</param>
+        public static void BroadcastEvent(Event e)
+        {
+            foreach (GameObject go in World.GetInstance().GetRegisteredObjects())
+            {
+                go.SendEvent(e);
+            }
         }
     }
 }

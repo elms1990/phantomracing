@@ -26,10 +26,14 @@ namespace PhantomRacing
         // Flag signalizing that this player shot
         private bool mShot = false;
 
-        public PlayerInputComponent(Player parent)
+        // Player index
+        private int mPlayerIndex;
+
+        public PlayerInputComponent(Player parent, int index)
             : base("PlayerInput")
         {
             mParent = parent;
+            mPlayerIndex = index;
         }
 
         public override void Initialize()
@@ -45,33 +49,32 @@ namespace PhantomRacing
             base.Update(timeStep);
 
             // Input update
-            //KeyboardState ks = Keyboard.GetState();
             InputState ks = KeyboardHandler.GetInstance().GetState();
-            if (ks.IsPressed("left"))
+            if (ks.IsPressed("p" + mPlayerIndex + "_left"))
             {
                 mTransform.Position.X -= mParent.Speed.X * timeStep;
             }
-            if (ks.IsPressed("right"))
+            if (ks.IsPressed("p" + mPlayerIndex + "_right"))
             {
                 mTransform.Position.X += mParent.Speed.X * timeStep;
             }
-            if (ks.IsPressed("up"))
+            if (ks.IsPressed("p" + mPlayerIndex + "_up"))
             {
                 mTransform.Position.Y -= mParent.Speed.Y * timeStep;
             }
-            if (ks.IsPressed("down"))
+            if (ks.IsPressed("p" + mPlayerIndex + "_down"))
             {
                 mTransform.Position.Y += mParent.Speed.Y * timeStep;
             }
-            if (ks.IsPressed("rleft"))
+            if (ks.IsPressed("p" + mPlayerIndex + "_rleft"))
             {
                 mTransform.Rotation -= mParent.RotationSpeed * timeStep;
             }
-            if (ks.IsPressed("rright"))
+            if (ks.IsPressed("p" + mPlayerIndex + "_rright"))
             {
                 mTransform.Rotation += mParent.RotationSpeed * timeStep;
             }
-            if (ks.IsPressed("shoot") && !mShot)
+            if (ks.IsPressed("p" + mPlayerIndex + "_shoot") && !mShot)
             {
                 mBullet.SpawnBullet();
                 mShot = true;

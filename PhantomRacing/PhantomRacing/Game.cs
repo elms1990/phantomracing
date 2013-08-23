@@ -23,7 +23,7 @@ namespace PhantomRacing
         private SpriteBatch spriteBatch;
 
         // Playerlist
-        private Player[] mPlayers = new Player[1];
+        private Player[] mPlayers = new Player[2];
 
         public Game()
         {
@@ -44,6 +44,9 @@ namespace PhantomRacing
         {
             base.Initialize();
 
+            // Create world instance
+            World.CreateInstance(1280, 768, 128);
+
             // Initialize AssetLoader
             AssetLoader.CreateInstance(Content);
 
@@ -54,25 +57,37 @@ namespace PhantomRacing
             KeyboardHandler.CreateInstance();
 
             // Load default keys for player 1
-            KeyboardHandler.GetInstance().Map("up", Keys.W)
-                .Map("left", Keys.A)
-                .Map("down", Keys.S)
-                .Map("right", Keys.D)
-                .Map("rleft", Keys.Left)
-                .Map("rright", Keys.Right)
-                .Map("shoot", Keys.Up);
+            KeyboardHandler.GetInstance().Map("p1_up", Keys.W)
+                .Map("p1_left", Keys.A)
+                .Map("p1_down", Keys.S)
+                .Map("p1_right", Keys.D)
+                .Map("p1_rleft", Keys.Left)
+                .Map("p1_rright", Keys.Right)
+                .Map("p1_shoot", Keys.Up);
+
+            // Load default keys for player 2
+            KeyboardHandler.GetInstance().Map("p2_up", Keys.NumPad8)
+                .Map("p2_left", Keys.NumPad4)
+                .Map("p2_down", Keys.NumPad2)
+                .Map("p2_right", Keys.NumPad6)
+                .Map("p2_rleft", Keys.NumPad7)
+                .Map("p2_rright", Keys.NumPad9)
+                .Map("p2_shoot", Keys.NumPad5);
             
             // Allocate players
             for (int i = 0; i < mPlayers.Length; i++)
             {
-                mPlayers[i] = new Player();
+                mPlayers[i] = new Player(i + 1);
                 mPlayers[i].AddComponent(new TransformComponent()).
-                    AddComponent(new PlayerInputComponent(mPlayers[i])).
+                    AddComponent(new PlayerInputComponent(mPlayers[i], i + 1)).
                     AddComponent(new BulletComponent(mPlayers[i])).
+                    AddComponent(new PhysicsComponent(mPlayers[i], CollisionType.Circle)).
                     AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player"))).
                     AddComponent(new LifeComponent(mPlayers[i], 100, 75));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
                 mPlayers[i].Initialize();
+
+                ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = i * 300;
             }
         }
 
@@ -101,13 +116,14 @@ namespace PhantomRacing
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
+
             KeyboardHandler.GetInstance().Update();
 
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
-            }
-            base.Update(gameTime);
+            }    
         }
 
         /// <summary>
@@ -116,6 +132,8 @@ namespace PhantomRacing
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            base.Draw(gameTime);
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
@@ -124,8 +142,6 @@ namespace PhantomRacing
                 mPlayers[i].Render(spriteBatch);
             }
             spriteBatch.End();
-
-            base.Draw(gameTime);
         }
     }
 }

@@ -19,8 +19,8 @@ namespace PhantomRacing
         // Rotate ratio
         public float RotationSpeed = 5.0f;
 
-        public Player()
-            : base("Player")
+        public Player(int index)
+            : base("p" + index + "_player")
         {
         }
 
@@ -42,6 +42,14 @@ namespace PhantomRacing
         public override void Shutdown()
         {
             base.Shutdown();
+        }
+
+        protected override void OnEvent(Event e)
+        {
+            if (e.EventName.CompareTo("Hit") == 0)
+            {
+                ((LifeComponent)GetComponent("Life")).TakeDamage(5);
+            }
         }
     }
 }
