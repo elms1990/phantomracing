@@ -166,14 +166,14 @@ namespace PhantomRacing
         }
 
         /// <summary>
-        /// Retrieves a list containing all registered objects.
+        /// Broadcasts an event to all registered objects in the game.
         /// </summary>
-        /// <returns>The original linked list containing
-        /// all objects. Manually changing this list might cause
-        /// inconsistencies. </returns>
-        public LinkedList<GameObject> GetRegisteredObjects()
+        public void BroadcastEvent(Event e)
         {
-            return mRegistered;
+            foreach (GameObject go in mRegistered)
+            {
+                go.ReceiveEvent(e);
+            }
         }
     }
 }

@@ -88,6 +88,8 @@ namespace PhantomRacing
             {
                 g.Shutdown();
             }
+
+            World.GetInstance().Remove(this);
         }
 
         /// <summary>
@@ -174,10 +176,7 @@ namespace PhantomRacing
         /// <param name="e">Event message.</param>
         public static void BroadcastEvent(Event e)
         {
-            foreach (GameObject go in World.GetInstance().GetRegisteredObjects())
-            {
-                go.SendEvent(e);
-            }
+            World.GetInstance().BroadcastEvent(e);
         }
     }
 }
