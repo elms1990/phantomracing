@@ -56,6 +56,34 @@ namespace PhantomRacing
         }
 
         /// <summary>
+        /// Refreshes objects position in the world.
+        /// </summary>
+        public void Update()
+        {
+            // Clears old world
+            for (int i = 0; i < mVerticalBins * mHorizontalBins; i++)
+            {
+                mWorld[i].Clear();
+            }
+
+            // Re-insterts objects in the world
+            foreach (GameObject go in mRegistered)
+            {
+                TransformComponent transform = (TransformComponent)go.GetComponent("Transform");
+                RenderComponent render = (RenderComponent)go.GetComponent("Render");
+
+                int rows = (int)(render.GetHeight() * mBinInverse);
+                for (int j = 0; j <= rows; j++)
+                {
+                    for (int i = (int)(transform.Position.X * mBinInverse); i <= (int)(render.GetWidth() * mBinInverse); i++)
+                    {
+                        mWorld[mHorizontalBins * j + i].AddLast(go);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Retrieves the objects on a given region.
         /// </summary>
         /// <param name="region">A rectangle defining the region.</param>
@@ -139,12 +167,9 @@ namespace PhantomRacing
         {
             mRegistered.Clear();
 
-            for (int j = 0; j <= mVerticalBins; j++)
+            for (int i = 0; i < mVerticalBins * mHorizontalBins; i++)
             {
-                for (int i = 0; i <= mHorizontalBins; i++)
-                {
-                    mWorld[j * mHorizontalBins + i].Clear();
-                }
+                mWorld[i].Clear();
             }
         }
 

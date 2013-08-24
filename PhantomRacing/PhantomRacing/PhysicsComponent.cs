@@ -50,7 +50,7 @@ namespace PhantomRacing
                 if (go != mParent)
                 {
                     PhysicsComponent physics = (PhysicsComponent) go.GetComponent("Physics");
-
+                    
                     if (physics != null)
                     {
                        // if (g

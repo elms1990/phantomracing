@@ -123,7 +123,9 @@ namespace PhantomRacing
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
-            }    
+            }
+
+            World.GetInstance().Update();
         }
 
         /// <summary>
