@@ -47,8 +47,8 @@ namespace PhantomRacing
             mTransform.Position.Y += timeStep * Speed.Y;
 
             // Remove bullet if out of screen.
-            if (mTransform.Position.X < 0 || mTransform.Position.X > Viewport.GetInstance().GetWidth() ||
-                mTransform.Position.Y < 0 || mTransform.Position.Y > Viewport.GetInstance().GetHeight())
+            if (mTransform.Position.X + mRender.GetWidth() < 0 || mTransform.Position.X > Viewport.GetInstance().GetWidth() ||
+                mTransform.Position.Y + mRender.GetHeight() < 0 || mTransform.Position.Y > Viewport.GetInstance().GetHeight())
             {
                 mParent.MarkRemoval(this);
             }
@@ -65,6 +65,15 @@ namespace PhantomRacing
             mTransform = null;
             mParent = null;
             mRender = null;
+        }
+
+        protected override void OnEvent(Event e)
+        {
+            if (e.EventName.CompareTo("collision") == 0
+                && ((String)e.Data).CompareTo("player") == 0)
+            {
+                mParent.MarkRemoval(this);
+            }
         }
     }
 }

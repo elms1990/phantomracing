@@ -46,7 +46,8 @@ namespace PhantomRacing
 
         protected override void OnEvent(Event e)
         {
-            if (e.EventName.CompareTo("Hit") == 0)
+            if (e.EventName.CompareTo("collision") == 0
+                && ((String)e.Data).CompareTo("bullet") == 0)
             {
                 ((LifeComponent)GetComponent("Life")).TakeDamage(5);
             }

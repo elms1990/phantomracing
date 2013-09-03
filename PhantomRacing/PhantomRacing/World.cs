@@ -72,12 +72,16 @@ namespace PhantomRacing
                 TransformComponent transform = (TransformComponent)go.GetComponent("Transform");
                 RenderComponent render = (RenderComponent)go.GetComponent("Render");
 
-                int rows = (int)(render.GetHeight() * mBinInverse);
-                for (int j = 0; j <= rows; j++)
+                int start_x = (int)(transform.Position.X * mBinInverse);
+                int end_x = start_x + (int)(render.GetWidth() * mBinInverse);
+                int start_y = (int)(transform.Position.Y * mBinInverse);
+                int end_y = start_y + (int)(render.GetHeight() * mBinInverse);
+
+                for (int j = start_y; j <= end_y; j++)
                 {
-                    for (int i = (int)(transform.Position.X * mBinInverse); i <= (int)(render.GetWidth() * mBinInverse); i++)
+                    for (int i = start_x; i <= end_x; i++)
                     {
-                        mWorld[mHorizontalBins * j + i].AddLast(go);
+                        mWorld[j * mHorizontalBins + i].AddLast(go);
                     }
                 }
             }
@@ -93,10 +97,14 @@ namespace PhantomRacing
         {
             HashSet<GameObject> objs = new HashSet<GameObject>();
 
-            int rows = (int)(region.Height * mBinInverse);
-            for (int j = 0; j <= rows; j++)
+            int start_x = (int)(region.X * mBinInverse);
+            int end_x = start_x + (int)(region.Width * mBinInverse);
+            int start_y = (int)(region.Y * mBinInverse);
+            int end_y = start_y + (int)(region.Height * mBinInverse);
+
+            for (int j = start_y; j <= end_y; j++)
             {
-                for (int i = (int)(region.X * mBinInverse); i <= (int)(region.Width * mBinInverse); i++)
+                for (int i = start_x; i <= end_x; i++)
                 {
                     foreach (GameObject go in mWorld[j * mHorizontalBins + i])
                     {
@@ -123,12 +131,16 @@ namespace PhantomRacing
 
             mRegistered.AddLast(go);
 
-            int rows = (int)(render.GetHeight() * mBinInverse);
-            for (int j = 0; j <= rows; j++)
+            int start_x = (int)(transform.Position.X * mBinInverse);
+            int end_x = start_x + (int)(render.GetWidth() * mBinInverse);
+            int start_y = (int)(transform.Position.Y * mBinInverse);
+            int end_y = start_y + (int)(render.GetHeight() * mBinInverse);
+
+            for (int j = start_y; j <= end_y; j++)
             {
-                for (int i = (int)(transform.Position.X * mBinInverse); i <= (int)(render.GetWidth() * mBinInverse); i++)
+                for (int i = start_x; i <= end_x; i++)
                 {
-                    mWorld[mHorizontalBins * j + i].AddLast(go);
+                    mWorld[j * mHorizontalBins + i].AddLast(go);
                 }
             }
         }
@@ -148,15 +160,18 @@ namespace PhantomRacing
 
             mRegistered.Remove(go);
 
-            int rows = (int)(render.GetHeight() * mBinInverse);
-            for (int j = 0; j <= rows; j++)
+            int start_x = (int)(transform.Position.X * mBinInverse);
+            int end_x = start_x + (int)(render.GetWidth() * mBinInverse);
+            int start_y = (int)(transform.Position.Y * mBinInverse);
+            int end_y = start_y + (int)(render.GetHeight() * mBinInverse);
+
+            for (int j = start_y; j <= end_y; j++)
             {
-                for (int i = (int)(transform.Position.X * mBinInverse); i <= (int)(render.GetWidth() * mBinInverse); i++)
+                for (int i = start_x; i <= end_x; i++)
                 {
-                    mWorld[mHorizontalBins * j + i].Remove(go);
+                    mWorld[j * mHorizontalBins + i].Remove(go);
                 }
             }
-
         }
 
         /// <summary>

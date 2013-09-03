@@ -20,14 +20,42 @@ namespace PhantomRacing
         // Re-usable rectangle
         private Rectangle mRect = new Rectangle();
 
+        // Collider rect
+        private Rectangle mCollider = new Rectangle();
+
         // Collision type
         private CollisionType mType;
 
-        public PhysicsComponent(GameObject parent, CollisionType type)
+        // Collision group
+        private String mGroup = "";
+
+        // Collides with
+        private List<String> mCollidesWith = new List<string>();
+
+        // Collision event
+        private Event mEvent;
+
+        public PhysicsComponent(GameObject parent, CollisionType type,
+            String group, List<String> collidesWith)
             : base("Physics")
         {
             mParent = parent;
             mType = type;
+
+            mEvent = new Event();
+            mEvent.Sender = mParent;
+
+            mGroup = group;
+            mCollidesWith = collidesWith;
+        }
+
+        public String GetGroup() {
+            return mGroup;
+        }
+
+        public bool CollidesWith(String group)
+        {
+            return mCollidesWith.Contains(group);
         }
 
         public override void Initialize()
@@ -50,10 +78,27 @@ namespace PhantomRacing
                 if (go != mParent)
                 {
                     PhysicsComponent physics = (PhysicsComponent) go.GetComponent("Physics");
-                    
-                    if (physics != null)
+                    TransformComponent transform = (TransformComponent)go.GetComponent("Transform");
+                    RenderComponent render = (RenderComponent)go.GetComponent("Render");
+
+                    if (physics != null && CollidesWith(physics.GetGroup()))
                     {
-                       // if (g
+                        mCollider.X = (int)transform.Position.X;
+                        mCollider.Y = (int)transform.Position.Y;
+                        mCollider.Width = render.GetWidth();
+                        mCollider.Height = render.GetHeight();
+
+                        if (PhysicsHelper.Collide(mParent, mType, go, physics.mType))
+                        {
+                            mEvent.EventName = "collision";
+                            mEvent.Data = (Object)physics.GetGroup();
+                            mEvent.Receiver = mParent;
+                            mParent.SendEvent(mEvent);
+
+                            mEvent.Receiver = go;
+                            mEvent.Data = (Object)GetGroup();
+                            go.SendEvent(mEvent);
+                        }
                     }
                 }
             }

@@ -71,13 +71,15 @@ namespace PhantomRacing
             TransformComponent tc = new TransformComponent();
             RenderComponent rc = new RenderComponent(b, AssetLoader.GetInstance().LoadAsset<Texture2D>("bullet"));
             b.AddComponent(tc).
+                AddComponent(new PhysicsComponent(b, CollisionType.Circle,
+                    "bullet", new List<String>() { "player" })).
                 AddComponent(rc);
 
             // Starting position
             tc.Position.X = (float)(mParentTransform.Position.X + mParentRender.GetWidth() / 2 - rc.GetWidth() / 2
-                - mParentRender.GetWidth() / 2 * Math.Sin(mParentTransform.Rotation));
+                - (mParentRender.GetWidth() + 20)/ 2 * Math.Sin(mParentTransform.Rotation));
             tc.Position.Y = (float)(mParentTransform.Position.Y + mParentRender.GetHeight() / 2 - rc.GetHeight() / 2
-                + mParentRender.GetHeight() / 2 * Math.Cos(mParentTransform.Rotation));
+                + (mParentRender.GetHeight() + 20)/ 2 * Math.Cos(mParentTransform.Rotation));
             tc.Rotation = mParentTransform.Rotation;
             b.Initialize();
             mBullets.Add(b);

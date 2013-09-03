@@ -45,7 +45,7 @@ namespace PhantomRacing
             base.Initialize();
 
             // Create world instance
-            World.CreateInstance(1280, 768, 128);
+            World.CreateInstance(2048, 2048, 128);
 
             // Initialize AssetLoader
             AssetLoader.CreateInstance(Content);
@@ -81,12 +81,13 @@ namespace PhantomRacing
                 mPlayers[i].AddComponent(new TransformComponent()).
                     AddComponent(new PlayerInputComponent(mPlayers[i], i + 1)).
                     AddComponent(new BulletComponent(mPlayers[i])).
-                    AddComponent(new PhysicsComponent(mPlayers[i], CollisionType.Circle)).
+                    AddComponent(new PhysicsComponent(mPlayers[i], CollisionType.Circle,
+                        "player", new List<string>() { "player", "bullet" })).
                     AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player"))).
                     AddComponent(new LifeComponent(mPlayers[i], 100, 75));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
                 mPlayers[i].Initialize();
-
+                
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = i * 300;
             }
         }
