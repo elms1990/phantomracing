@@ -86,9 +86,11 @@ namespace PhantomRacing
                     AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player"))).
                     AddComponent(new LifeComponent(mPlayers[i], 100, 75));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
-                mPlayers[i].Initialize();
                 
-                ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = i * 300;
+                ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = 75 + i * 300;
+                ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.Y = 300 + i * 120;
+
+                mPlayers[i].Initialize();
             }
         }
 

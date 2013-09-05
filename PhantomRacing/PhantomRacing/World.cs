@@ -98,9 +98,9 @@ namespace PhantomRacing
             HashSet<GameObject> objs = new HashSet<GameObject>();
 
             int start_x = (int)(region.X * mBinInverse);
-            int end_x = start_x + (int)(region.Width * mBinInverse);
+            int end_x = (int)((region.X + region.Width) * mBinInverse);
             int start_y = (int)(region.Y * mBinInverse);
-            int end_y = start_y + (int)(region.Height * mBinInverse);
+            int end_y = (int)((region.Y + region.Height) * mBinInverse);
 
             for (int j = start_y; j <= end_y; j++)
             {
@@ -132,9 +132,9 @@ namespace PhantomRacing
             mRegistered.AddLast(go);
 
             int start_x = (int)(transform.Position.X * mBinInverse);
-            int end_x = start_x + (int)(render.GetWidth() * mBinInverse);
+            int end_x = (int)((transform.Position.X + render.GetWidth()) * mBinInverse);
             int start_y = (int)(transform.Position.Y * mBinInverse);
-            int end_y = start_y + (int)(render.GetHeight() * mBinInverse);
+            int end_y = (int)((transform.Position.Y + render.GetHeight()) * mBinInverse);
 
             for (int j = start_y; j <= end_y; j++)
             {
@@ -161,9 +161,9 @@ namespace PhantomRacing
             mRegistered.Remove(go);
 
             int start_x = (int)(transform.Position.X * mBinInverse);
-            int end_x = start_x + (int)(render.GetWidth() * mBinInverse);
+            int end_x = (int)((transform.Position.X + render.GetWidth()) * mBinInverse);
             int start_y = (int)(transform.Position.Y * mBinInverse);
-            int end_y = start_y + (int)(render.GetHeight() * mBinInverse);
+            int end_y = (int)((transform.Position.Y + render.GetHeight()) * mBinInverse);
 
             for (int j = start_y; j <= end_y; j++)
             {
