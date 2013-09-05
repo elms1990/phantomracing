@@ -15,6 +15,9 @@ namespace PhantomRacing
         // Transform component
         private TransformComponent mTransform;
 
+        // Physics component
+        private PhysicsComponent mPhysics;
+
         // Render Component
         private RenderComponent mRender;
 
@@ -33,7 +36,10 @@ namespace PhantomRacing
             // Gets the reference of transform and render components
             mTransform = (TransformComponent)GetComponent("Transform");
             mRender = (RenderComponent)GetComponent("Render");
-            
+            mPhysics = (PhysicsComponent)GetComponent("Physics");
+
+            mTransform.Position.Z = 0.6f;
+
             // Update speed vector
             Speed.X = - (float)(Speed.X * Math.Sin(mTransform.Rotation));
             Speed.Y = (float)(Speed.Y * Math.Cos(mTransform.Rotation));
@@ -43,25 +49,21 @@ namespace PhantomRacing
         {
             base.Update(timeStep);
 
-            mTransform.Position.X += timeStep * Speed.X;
-            mTransform.Position.Y += timeStep * Speed.Y;
+            mPhysics.Speed.X = Speed.X;
+            mPhysics.Speed.Y = Speed.Y;
 
             // Remove bullet if out of screen.
-            if (mTransform.Position.X + mRender.GetWidth() < 0 || mTransform.Position.X > Viewport.GetInstance().GetWidth() ||
-                mTransform.Position.Y + mRender.GetHeight() < 0 || mTransform.Position.Y > Viewport.GetInstance().GetHeight())
+            if (mTransform.Position.X + mRender.GetWidth() < 0 || mTransform.Position.X > Renderer.GetInstance().GetWidth() ||
+                mTransform.Position.Y + mRender.GetHeight() < 0 || mTransform.Position.Y > Renderer.GetInstance().GetHeight())
             {
                 mParent.MarkRemoval(this);
             }
         }
 
-        public override void Render(SpriteBatch spriteBatch)
-        {
-            base.Render(spriteBatch);
-        }
-
         public override void Shutdown()
         {
             base.Shutdown();
+
             mTransform = null;
             mParent = null;
             mRender = null;

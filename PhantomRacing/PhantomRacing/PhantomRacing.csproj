@@ -131,8 +131,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="RenderComponent.cs" />
+    <Compile Include="Renderer.cs" />
     <Compile Include="TransformComponent.cs" />
-    <Compile Include="Viewport.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>

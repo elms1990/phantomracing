@@ -45,19 +45,40 @@ namespace PhantomRacing
             return false;
         }
 
-        private static bool TestCircleCircleCollision(int collider_center_x, int collider_center_y, int collider_radius,
-            int collided_center_x, int collided_center_y, int collided_radius)
+        private static void MoveOut(TransformComponent colliderTransform, int colliderRadius,
+            TransformComponent collidedTransform, int collidedRadius)
         {
-            sCenterVec.X = collider_center_x;
-            sCenterVec.Y = collider_center_y;
-            sCenterVec2.X = collided_center_x;
-            sCenterVec2.Y = collided_center_y;
+            int dx = (int)(colliderTransform.Position.X - collidedTransform.Position.X);
+            int dy = (int)(colliderTransform.Position.Y - collidedTransform.Position.Y);
+
+            // Left to right collision
+            if (dx < 0)
+            {
+
+            }
+            else
+            {
+                // Right to left collision
+                if (dx > 0)
+                {
+
+                }
+            }
+        }
+
+        private static bool TestCircleCircleCollision(int colliderCenterX, int colliderCenterY, int colliderRadius,
+            int collidedCenterX, int collidedCenterY, int collidedRadius)
+        {
+            sCenterVec.X = colliderCenterX;
+            sCenterVec.Y = colliderCenterY;
+            sCenterVec2.X = collidedCenterX;
+            sCenterVec2.Y = collidedCenterY;
 
             float dist;
 
             Vector2.Distance(ref sCenterVec, ref sCenterVec2, out dist);
 
-            return dist <= collider_radius + collided_radius;
+            return dist <= colliderRadius + collidedRadius;
         }
     }
 }

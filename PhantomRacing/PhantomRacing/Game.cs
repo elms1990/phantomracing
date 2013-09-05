@@ -50,8 +50,8 @@ namespace PhantomRacing
             // Initialize AssetLoader
             AssetLoader.CreateInstance(Content);
 
-            // Initialize Viewport
-            Viewport.CreateInstance(graphics.GraphicsDevice);
+            // Initialize Renderer
+            Renderer.CreateInstance(graphics.GraphicsDevice);
 
             // Initialize KeyboardHandler
             KeyboardHandler.CreateInstance();
@@ -139,7 +139,7 @@ namespace PhantomRacing
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Render(spriteBatch);

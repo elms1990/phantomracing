@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace PhantomRacing
@@ -13,6 +14,9 @@ namespace PhantomRacing
 
         // Parent's transform component reference
         private TransformComponent mTransform = null;
+
+        // Physics component reference
+        private PhysicsComponent mPhysics = null;
 
         // Bullet component
         private BulletComponent mBullet = null;
@@ -29,6 +33,8 @@ namespace PhantomRacing
         // Player index
         private int mPlayerIndex;
 
+        private Vector2 mSpeed = new Vector2(150);
+
         public PlayerInputComponent(Player parent, int index)
             : base("PlayerInput")
         {
@@ -38,33 +44,33 @@ namespace PhantomRacing
 
         public override void Initialize()
         {
-            base.Initialize();
-
             mTransform = (TransformComponent)mParent.GetComponent("Transform");
+            mPhysics = (PhysicsComponent)mParent.GetComponent("Physics");
             mBullet = (BulletComponent)mParent.GetComponent("Bullet");
         }
 
         public override void Update(float timeStep)
         {
-            base.Update(timeStep);
+            mPhysics.Speed.X = 0;
+            mPhysics.Speed.Y = 0;
 
             // Input update
             InputState ks = KeyboardHandler.GetInstance().GetState();
             if (ks.IsPressed("p" + mPlayerIndex + "_left"))
             {
-                mTransform.Position.X -= mParent.Speed.X * timeStep;
+                mPhysics.Speed.X = -mSpeed.X;
             }
             if (ks.IsPressed("p" + mPlayerIndex + "_right"))
             {
-                mTransform.Position.X += mParent.Speed.X * timeStep;
+                mPhysics.Speed.X = mSpeed.X;
             }
             if (ks.IsPressed("p" + mPlayerIndex + "_up"))
             {
-                mTransform.Position.Y -= mParent.Speed.Y * timeStep;
+                mPhysics.Speed.Y = -mSpeed.Y;
             }
             if (ks.IsPressed("p" + mPlayerIndex + "_down"))
             {
-                mTransform.Position.Y += mParent.Speed.Y * timeStep;
+                mPhysics.Speed.Y = mSpeed.Y;
             }
             if (ks.IsPressed("p" + mPlayerIndex + "_rleft"))
             {

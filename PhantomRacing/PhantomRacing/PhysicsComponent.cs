@@ -35,6 +35,9 @@ namespace PhantomRacing
         // Collision event
         private Event mEvent;
 
+        // Velocity
+        public Vector2 Speed = new Vector2();
+
         public PhysicsComponent(GameObject parent, CollisionType type,
             String group, List<String> collidesWith)
             : base("Physics")
@@ -66,6 +69,8 @@ namespace PhantomRacing
 
         public override void Update(float timeStep)
         {
+            mTransform.Position.X += Speed.X * timeStep;
+            mTransform.Position.Y += Speed.Y * timeStep;
             mRect.X = (int)mTransform.Position.X;
             mRect.Y = (int)mTransform.Position.Y;
             mRect.Width = mRender.GetWidth();

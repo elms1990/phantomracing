@@ -9,7 +9,7 @@ namespace PhantomRacing
     public class TransformComponent : GameComponent
     {
         // Object position, in pixel coordinates
-        public Vector2 Position = new Vector2(0);
+        public Vector3 Position = new Vector3(0);
 
         // Scaling factor
         public Vector2 Scale = new Vector2(1);

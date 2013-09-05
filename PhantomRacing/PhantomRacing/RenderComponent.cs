@@ -87,7 +87,7 @@ namespace PhantomRacing
         public override void Render(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(mTexture, mRectangle, null, Color.White,
-                mTransform.Rotation, Center, SpriteEffects.None, 0);
+                mTransform.Rotation, Center, SpriteEffects.None, mTransform.Position.Z);
         }
     }
 }

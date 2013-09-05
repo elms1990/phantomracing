@@ -2,28 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace PhantomRacing
 {
-    public class Viewport
+    public class Renderer
     {
-        private static Viewport sInstance = null;
+        private static Renderer sInstance = null;
 
         private GraphicsDevice mDevice;
 
-        private Viewport(GraphicsDevice device)
+        private Renderer(GraphicsDevice graphicsDevice)
         {
-            mDevice = device;
+            mDevice = graphicsDevice;
         }
 
-        public static void CreateInstance(GraphicsDevice device)
+        public static void CreateInstance(GraphicsDevice graphicsDevice)
         {
             if (sInstance == null)
-                sInstance = new Viewport(device);
+            {
+                sInstance = new Renderer(graphicsDevice);
+            }
         }
 
-        public static Viewport GetInstance()
+        public static Renderer GetInstance()
         {
             return sInstance;
         }

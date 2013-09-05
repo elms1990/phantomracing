@@ -27,6 +27,9 @@ namespace PhantomRacing
         public override void Initialize()
         {
             base.Initialize();
+
+            // Forces this object to be drawn on top of all others.
+            (GetComponent("Transform") as TransformComponent).Position.Z = 0.5f;
         }
 
         public override void Update(float timeStep)
