@@ -40,5 +40,10 @@ namespace PhantomRacing
         {
             return mDevice.Viewport.Height;
         }
+
+        public GraphicsDevice GetGraphicsDevice()
+        {
+            return mDevice;
+        }
     }
 }

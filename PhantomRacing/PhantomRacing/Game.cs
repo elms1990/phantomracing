@@ -16,6 +16,16 @@ namespace PhantomRacing
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
+        private const int WINDOW_WIDTH = 1024;
+        private const int WINDOW_HEIGHT = 768;
+
+        private KinectManager mKinect;
+        private World mWorld;
+        private KeyboardHandler mKeyboard;
+        private AssetLoader mAssetLoader;
+
+        private SpriteFont mFont;
+
         // Object reference to GraphicsDevice.
         private GraphicsDeviceManager graphics;
 
@@ -25,13 +35,19 @@ namespace PhantomRacing
         // Playerlist
         private Player[] mPlayers = new Player[2];
 
+        private Rectangle mBlittingRectangle;
+
+        private const int REFERENCE_DISTANCE = 120;
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 768;
+            graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
+            graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
             //graphics.ToggleFullScreen();
             Content.RootDirectory = "Content";
+
+            mBlittingRectangle = new Rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         }
 
         /// <summary>
@@ -46,15 +62,23 @@ namespace PhantomRacing
 
             // Create world instance
             World.CreateInstance(2048, 2048, 128);
+            mWorld = World.GetInstance();
 
             // Initialize AssetLoader
             AssetLoader.CreateInstance(Content);
+            mAssetLoader = AssetLoader.GetInstance();
+            mFont = AssetLoader.GetInstance().LoadAsset<SpriteFont>("font");
 
             // Initialize Renderer
             Renderer.CreateInstance(graphics.GraphicsDevice);
 
             // Initialize KeyboardHandler
             KeyboardHandler.CreateInstance();
+            mKeyboard = KeyboardHandler.GetInstance();
+
+            // Initialize Kinect
+            KinectManager.CreateInstance();
+            mKinect = KinectManager.GetInstance();
 
             // Load default keys for player 1
             KeyboardHandler.GetInstance().Map("p1_up", Keys.W)
@@ -86,12 +110,14 @@ namespace PhantomRacing
                     AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player"))).
                     AddComponent(new LifeComponent(mPlayers[i], 100, 75));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
-                
+
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = 75 + i * 300;
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.Y = 300 + i * 120;
 
                 mPlayers[i].Initialize();
             }
+
+            mKinect.StartKinect();
         }
 
         /// <summary>
@@ -101,7 +127,6 @@ namespace PhantomRacing
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
         }
 
         /// <summary>
@@ -110,6 +135,7 @@ namespace PhantomRacing
         /// </summary>
         protected override void UnloadContent()
         {
+            mKinect.StopKinect();
         }
 
         /// <summary>
@@ -121,14 +147,14 @@ namespace PhantomRacing
         {
             base.Update(gameTime);
 
-            KeyboardHandler.GetInstance().Update();
+            mKeyboard.Update();
 
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             }
 
-            World.GetInstance().Update();
+            mWorld.Update();
         }
 
         /// <summary>
@@ -142,10 +168,20 @@ namespace PhantomRacing
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
+
+            if (mKinect.GetArena() != null)
+            {
+                spriteBatch.Draw(mKinect.GetArena(), mBlittingRectangle, null, Color.White,
+                    0, Vector2.Zero, SpriteEffects.None, 1);
+            }
+
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Render(spriteBatch);
             }
+
+            spriteBatch.DrawString(mFont, "Max Depth: " + mKinect.GetMaxDepth(), Vector2.Zero, Color.Black,
+                0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.99f);
             spriteBatch.End();
         }
     }

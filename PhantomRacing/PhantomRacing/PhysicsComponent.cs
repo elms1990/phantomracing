@@ -76,6 +76,26 @@ namespace PhantomRacing
             mRect.Width = mRender.GetWidth();
             mRect.Height = mRender.GetHeight();
 
+            //Per-pixel collision test
+            KinectManager kinect = KinectManager.GetInstance();
+            Renderer renderer = Renderer.GetInstance();
+            if (mParent.GetId() == "Bullet")
+            {
+                bool collided = PhysicsHelper.CheckPixelCollision(mParent, kinect.GetRawArena(),
+                   ((float)kinect.GetColorFrameWidth()) / renderer.GetWidth(),
+                    ((float)kinect.GetColorFrameHeight()) / renderer.GetHeight());
+
+                if (collided)
+                {
+                    mEvent.EventName = "collision";
+                    mEvent.Data = "player";
+                    mEvent.Receiver = mParent;
+                    mParent.SendEvent(mEvent);
+                }
+            }
+
+            
+
             HashSet<GameObject> objs = World.GetInstance().QueueRegion(mRect);
 
             foreach (GameObject go in objs)

@@ -17,6 +17,8 @@ namespace PhantomRacing
         public static bool Collide(GameObject collider, CollisionType colliderType, 
             GameObject collided, CollisionType collidedType)
         {
+            bool collide = false;
+
             switch (colliderType)
             {
                 case CollisionType.Circle:
@@ -26,22 +28,63 @@ namespace PhantomRacing
                         RenderComponent colliderRender = (RenderComponent)collider.GetComponent("Render");
                         TransformComponent collidedTransform = (TransformComponent)collided.GetComponent("Transform");
                         RenderComponent collidedRender = (RenderComponent)collided.GetComponent("Render");
-
-                        return TestCircleCircleCollision((int)(colliderTransform.Position.X + colliderRender.GetWidth() / 2),
+                        
+                        collide = TestCircleCircleCollision((int)(colliderTransform.Position.X + colliderRender.GetWidth() / 2),
                             (int)(colliderTransform.Position.Y + colliderRender.GetHeight() / 2),
                             colliderRender.GetWidth() / 2,
                             (int)(collidedTransform.Position.X + collidedRender.GetWidth() / 2),
                             (int)(collidedTransform.Position.Y + collidedRender.GetHeight() / 2),
                             collidedRender.GetWidth() / 2);
+
+                        if (collide)
+                        {
+                            MoveOut(colliderTransform, colliderRender.GetWidth() / 2,
+                                collidedTransform, collidedRender.GetWidth() / 2);
+                        }
                     }
                     break;   
             }
 
-            return false;
+            return collide;
         }
 
-        public static bool Collide(GameObject collider, int[] field)
+        public static bool CheckPixelCollision(GameObject collider, byte[] physicalObjects, float scaleX, float scaleY)
         {
+            TransformComponent colliderTransform = (TransformComponent)collider.GetComponent("Transform");
+            RenderComponent colliderRender = (RenderComponent)collider.GetComponent("Render");
+            int scaledX = (int) (scaleX * colliderTransform.Position.X);
+            int scaledY = (int) (scaleY * colliderTransform.Position.Y);
+            int scaledW = (int)(scaleX * colliderRender.GetWidth());
+            int scaledH = (int)(scaleY * colliderRender.GetHeight());
+            int frameW = KinectManager.GetInstance().GetColorFrameWidth();
+            int frameH = KinectManager.GetInstance().GetColorFrameHeight();
+            byte[] pixelBuffer = colliderRender.GetPixelBuffer();
+
+            if (scaledX < 0 || scaledY < 0 || scaledX > frameW || scaledY > frameH)
+            {
+                return false;
+            }
+
+            for (int j = 0; j < colliderRender.GetHeight(); j++)
+            {
+                for (int i = 0; i < colliderRender.GetWidth(); i++)
+                {
+                    if (physicalObjects[frameW * scaledY + scaledX + i] == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            // Top check
+            //for (int i = 0; i < colliderRender.GetWidth(); i++)
+            //{
+            //    if (physicalObjects[scaledY * frameW + i] == 0)
+            //    {
+            //        return true;
+            //    }
+            //}
+
             return false;
         }
 
