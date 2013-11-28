@@ -60,10 +60,13 @@ namespace PhantomRacing
             int frameH = KinectManager.GetInstance().GetColorFrameHeight();
             byte[] pixelBuffer = colliderRender.GetPixelBuffer();
 
-            if (scaledX < 0 || scaledY < 0 || scaledX > frameW || scaledY > frameH)
+            // Prevents out of index issues, because out of window verification is
+            // done after this step.
+            if (scaledX < 0 || scaledY < 0 || scaledX >= frameW || scaledY >= frameH)
             {
                 return false;
             }
+
 
             for (int j = 0; j < colliderRender.GetHeight(); j++)
             {

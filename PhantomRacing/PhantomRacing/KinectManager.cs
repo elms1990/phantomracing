@@ -118,7 +118,7 @@ namespace PhantomRacing
 
                     if (pixel >= mThreshold)
                     {
-                        pixel = 0xff;
+                        pixel = 0x0000ffff;
                     }
                     else
                     {
