@@ -118,18 +118,17 @@ namespace PhantomRacing
 
                     if (pixel >= mThreshold)
                     {
-                        pixel = 0x0000ffff;
+                        pixel = 0xff;
                     }
                     else
                     {
                         pixel = 0x0;
                     }
 
-                    for (int j = i; j < i + 3; j++)
-                    {
-                        mColorInformation[j] = (byte)pixel;
-                    }
-                    mColorInformation[i + 3] = 0xff;
+                    mColorInformation[i] = 0;
+                    mColorInformation[i + 1] = 0;
+                    mColorInformation[i + 2] = 0;
+                    mColorInformation[i + 3] = (byte)(0xff - (byte)pixel);
                     mArena[i / 4] = (byte)pixel;
                 }
                 
