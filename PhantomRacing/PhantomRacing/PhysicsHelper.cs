@@ -67,14 +67,14 @@ namespace PhantomRacing
 
             // Prevents out of index issues, because out of window verification is
             // done after this step.
-            if (scaledX < 0 || scaledY < 0 || scaledX >= frameW || scaledY >= frameH)
+            if (scaledX < 0 || scaledY < 0 || scaledX + scaledW >= frameW || scaledY + scaledH >= frameH)
             {
-                return false;
+                return true;
             }
 
             Console.Out.WriteLine(colliderRender.GetHeight());
 
-            for (int j = 0; j < colliderRender.GetHeight() * 0.4; j++)
+            for (int j = 0; j < colliderRender.GetHeight() * 0.45; j++)
             {
                 for (int i = 0; i < colliderRender.GetWidth() * 0.9; i++)
                 {
