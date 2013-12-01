@@ -96,11 +96,6 @@ namespace PhantomRacing
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
-                //if (mDepthBuffer != null)
-                //{
-                //    return;
-                //}
-
                 if (colorFrame == null)
                 {
                     return;
@@ -145,11 +140,20 @@ namespace PhantomRacing
                     return;
                 }
 
-                depthFrame.CopyDepthImagePixelDataTo(mDepthData);
-                mMinDepth = depthFrame.MinDepth;
-                mMaxDepth = depthFrame.MaxDepth;
-
-                ProcessDepthData();
+                mMaxDepth = 0;
+                for (int i = 0; i < mDepthData.Length; i++)
+                {
+                    if (mDepthData[i].Depth > mMaxDepth &&
+                        mDepthData[i].Depth < 4000)
+                    {
+                        if (mDepthData[i].Depth < mMaxDepth) 
+                        {
+                            mMaxDepth = mDepthData[i].Depth;
+                        }
+                    }
+                    //mMaxDepth = (mDepthData[i].Depth != 0 && 
+                    //    mDepthData[i].Depth < mMaxDepth) ? mDepthData[i].Depth : mMaxDepth;
+                }
             }
         }
 
@@ -162,8 +166,8 @@ namespace PhantomRacing
 
             //if (mDepthBuffer == null)
             //{
-                mDepthBuffer = new Texture2D(Renderer.GetInstance().GetGraphicsDevice(),
-                    mKinectSensor.DepthStream.FrameWidth, mKinectSensor.DepthStream.FrameHeight);
+                //mDepthBuffer = new Texture2D(Renderer.GetInstance().GetGraphicsDevice(),
+                //    mKinectSensor.DepthStream.FrameWidth, mKinectSensor.DepthStream.FrameHeight);
             //}
 
             if (mConvertedDepthData == null)

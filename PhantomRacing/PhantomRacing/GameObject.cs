@@ -178,5 +178,10 @@ namespace PhantomRacing
         {
             World.GetInstance().BroadcastEvent(e);
         }
+
+        public List<GameComponent> GetComponents()
+        {
+            return mChildren;
+        }
     }
 }

@@ -19,9 +19,16 @@ namespace PhantomRacing
         // Rotate ratio
         public float RotationSpeed = 5.0f;
 
+        private TransformComponent mTransform;
+        private RenderComponent mRender;
+        private LifeComponent mLifeComponent;
+
+        private bool mAlive;
+
         public Player(int index)
             : base("p" + index + "_player")
         {
+            mAlive = true;
         }
 
         public override void Initialize()
@@ -29,22 +36,53 @@ namespace PhantomRacing
             base.Initialize();
 
             // Forces this object to be drawn on top of all others.
-            (GetComponent("Transform") as TransformComponent).Position.Z = 0.5f;
+            mTransform = (TransformComponent)GetComponent("Transform");
+            mTransform.Position.Z = 0.5f;
+
+            mRender = (RenderComponent)GetComponent("Render");
+            mLifeComponent = (LifeComponent)GetComponent("Life");
         }
 
         public override void Update(float timeStep)
         {
-            base.Update(timeStep);
+            if (mAlive)
+            {
+                base.Update(timeStep);
+            }
         }
         
         public override void Render(SpriteBatch spriteBatch)
         {
-            base.Render(spriteBatch);
+            if (mAlive)
+            {
+                base.Render(spriteBatch);
+            }
         }
 
         public override void Shutdown()
         {
             base.Shutdown();
+        }
+
+        public void SaveState()
+        {
+            foreach (GameComponent c in GetComponents())
+            {
+                c.SaveState();
+            }
+        }
+
+        public void LoadState()
+        {
+            foreach (GameComponent c in GetComponents())
+            {
+                c.LoadState();
+            }
+        }
+
+        public bool IsAlive()
+        {
+            return mAlive;
         }
 
         protected override void OnEvent(Event e)
@@ -53,6 +91,26 @@ namespace PhantomRacing
                 && ((String)e.Data).CompareTo("bullet") == 0)
             {
                 ((LifeComponent)GetComponent("Life")).TakeDamage(5);
+
+                return;
+            }
+
+            if (e.EventName.CompareTo("Killed") == 0)
+            {
+                mAlive = false;
+                mTransform.Position.X = -mRender.GetWidth();
+                mTransform.Position.Y = -mRender.GetHeight();
+
+                return;
+            }
+
+            if (e.EventName.CompareTo("Reset") == 0)
+            {
+                mAlive = true;
+                LoadState();
+                //mLifeComponent.LoadState();
+
+                return;
             }
         }
     }

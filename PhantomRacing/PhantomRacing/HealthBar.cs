@@ -21,6 +21,8 @@ namespace PhantomRacing
         // Players current life
         private int mCurrentLife;
 
+        private int mSavedStartingLife;
+
         // Transform object
         private TransformComponent mTransform;
 
@@ -33,6 +35,8 @@ namespace PhantomRacing
         // Health renderer
         private RenderComponent mHealthRenderer;
 
+        private Event mEvent;
+
         public HealthBar(GameObject parent, int maxLife, int startingLife)
             : base("HealthBar")
         {
@@ -40,6 +44,9 @@ namespace PhantomRacing
             mMaxLife = maxLife;
             mStartingLife = startingLife;
             mCurrentLife = startingLife;
+            mSavedStartingLife = startingLife;
+
+            mEvent = new Event();
         }
 
         public override void Initialize()
@@ -70,9 +77,14 @@ namespace PhantomRacing
         {
             mCurrentLife -= dmg;
 
-            if (mCurrentLife < 0)
+            if (mCurrentLife <= 0)
             {
                 mCurrentLife = 0;
+                mEvent.Sender = this;
+                mEvent.Receiver = mParent;
+                mEvent.EventName = "Killed";
+
+                mParent.SendEvent(mEvent);
             }
 
             if (mCurrentLife > mMaxLife)
@@ -80,5 +92,11 @@ namespace PhantomRacing
                 mCurrentLife = mMaxLife;
             }
         }
+
+        public void Reset()
+        {
+            mCurrentLife = mSavedStartingLife;
+        }
+        
     }
 }

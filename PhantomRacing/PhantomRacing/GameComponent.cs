@@ -41,5 +41,15 @@ namespace PhantomRacing
         public virtual void Shutdown()
         {
         }
+
+        public virtual void SaveState()
+        {
+
+        }
+
+        public virtual void LoadState()
+        {
+
+        }
     }
 }

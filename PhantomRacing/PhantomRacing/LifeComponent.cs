@@ -20,6 +20,10 @@ namespace PhantomRacing
         // Player starting life
         private int mStartingLife;
 
+        // Saved State
+        private int mSavedStartingLife;
+        private int mSavedMaxLife;
+
         public LifeComponent(GameObject parent, int maxLife, int startingLife)
             : base("Life")
         {
@@ -75,6 +79,19 @@ namespace PhantomRacing
         public void TakeDamage(int dmg)
         {
             mHealthBar.TakeDamage(dmg);
+        }
+
+        public override void SaveState()
+        {
+            mSavedMaxLife = mMaxLife;
+            mSavedStartingLife = mStartingLife;
+        }
+
+        public override void LoadState()
+        {
+            mMaxLife = mSavedMaxLife;
+            mStartingLife = mSavedStartingLife;
+            mHealthBar.Reset();
         }
     }
 }

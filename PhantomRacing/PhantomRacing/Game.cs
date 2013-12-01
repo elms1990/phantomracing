@@ -32,8 +32,11 @@ namespace PhantomRacing
         // Use this to draw stuff on the screen.
         private SpriteBatch spriteBatch;
 
+        private static readonly int mNumberOfPlayers = 3;
+
         // Playerlist
-        private Player[] mPlayers = new Player[2];
+        private Player[] mPlayers = new Player[mNumberOfPlayers];
+        private Event mEvent = new Event();
 
         private Rectangle mBlittingRectangle;
 
@@ -109,20 +112,16 @@ namespace PhantomRacing
                     AddComponent(new BulletComponent(mPlayers[i])).
                     AddComponent(new PhysicsComponent(mPlayers[i], CollisionType.Circle,
                         "player", new List<string>() { "player", "bullet" })).
-                    AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player"))).
-                    AddComponent(new LifeComponent(mPlayers[i], 100, 75));
+                    AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player" + (i + 1)))).
+                    AddComponent(new LifeComponent(mPlayers[i], 30, 30));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
 
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = 75 + i * 300;
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.Y = 300 + i * 120;
 
                 mPlayers[i].Initialize();
+                mPlayers[i].SaveState();
             }
-
-            //if (Globals.DEBUG)
-            //{
-            //    PhysicsDebug = (PhysicsComponent)mPlayers[0].GetComponent("Physics");
-            //}
 
             mKinect.StartKinect();
         }
@@ -156,6 +155,23 @@ namespace PhantomRacing
 
             mKeyboard.Update();
 
+            // Defeat Condition
+            int defeated = 0;
+            for (int i = 0; i < mPlayers.Length; i++)
+            {
+                if (!mPlayers[i].IsAlive())
+                {
+                    defeated++;
+                }
+            }
+
+            // Reset
+            if (defeated >= mNumberOfPlayers - 1)
+            {
+                mEvent.EventName = "Reset";
+                GameObject.BroadcastEvent(mEvent);
+            }
+
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
@@ -175,9 +191,6 @@ namespace PhantomRacing
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
-
-            //spriteBatch.DrawString(mFont, "Vx: " + PhysicsDebug.Speed.X + " Vy: " + PhysicsDebug.Speed.Y,
-                    //Vector2.Zero, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.99f);
 
             if (mKinect.GetArena() != null)
             {

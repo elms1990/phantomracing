@@ -71,7 +71,8 @@ namespace PhantomRacing
 
         protected override void OnEvent(Event e)
         {
-            if (e.EventName.CompareTo("collision") == 0)
+            if (e.EventName.CompareTo("collision") == 0 ||
+                e.EventName == "Reset")
             {
                 mParent.MarkRemoval(this);
             }
