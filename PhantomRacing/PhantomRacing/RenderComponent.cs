@@ -37,7 +37,7 @@ namespace PhantomRacing
         public int LeftMargin = 0;
         public int TopMargin = 0;
 
-        private byte[] mPixelBuffer;
+        private Color[] mPixelBuffer;
 
         public RenderComponent(GameObject parent, Texture2D texture)
             : base("Render")
@@ -48,7 +48,7 @@ namespace PhantomRacing
             mWidth = mTexture.Width;
             mHeight = mTexture.Height;
 
-            mPixelBuffer = new byte[mWidth * mHeight * 4];
+            mPixelBuffer = new Color[mWidth * mHeight];
         }
 
         public void SetWidth(int width)
@@ -71,7 +71,7 @@ namespace PhantomRacing
             return mHeight;
         }
 
-        public byte[] GetPixelBuffer()
+        public Color[] GetPixelBuffer()
         {
             mTexture.GetData(mPixelBuffer);
 

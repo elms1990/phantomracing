@@ -33,7 +33,7 @@ namespace PhantomRacing
         private SpriteBatch spriteBatch;
 
         // Playerlist
-        private Player[] mPlayers = new Player[2];
+        private Player[] mPlayers = new Player[4];
 
         private Rectangle mBlittingRectangle;
 

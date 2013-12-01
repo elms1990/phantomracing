@@ -63,7 +63,7 @@ namespace PhantomRacing
             int scaledH = (int)(scaleY * colliderRender.GetHeight());
             int frameW = KinectManager.GetInstance().GetColorFrameWidth();
             int frameH = KinectManager.GetInstance().GetColorFrameHeight();
-            byte[] pixelBuffer = colliderRender.GetPixelBuffer();
+            Color[] pixelBuffer = colliderRender.GetPixelBuffer();
 
             // Prevents out of index issues, because out of window verification is
             // done after this step.
@@ -72,13 +72,15 @@ namespace PhantomRacing
                 return false;
             }
 
-            for (int j = 0; j < colliderRender.GetHeight(); j++)
+            Console.Out.WriteLine(colliderRender.GetHeight());
+
+            for (int j = 0; j < colliderRender.GetHeight() * 0.4; j++)
             {
-                for (int i = 0; i < colliderRender.GetWidth(); i++)
+                for (int i = 0; i < colliderRender.GetWidth() * 0.9; i++)
                 {
                     if ((frameW * (scaledY + j) + scaledX + i < physicalObjects.Length) &&
                         physicalObjects[(int) (frameW * (scaledY + j) + scaledX + i * scaleX)] == 0
-                        && pixelBuffer[4 * (j * colliderRender.GetWidth() + i + 1) - 1] > 0)
+                        && pixelBuffer[(j * colliderRender.GetWidth() + i + 1) - 1].A > 0)
                     {
                         return true;
                     }
