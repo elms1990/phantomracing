@@ -76,7 +76,9 @@ namespace PhantomRacing
             {
                 for (int i = 0; i < colliderRender.GetWidth(); i++)
                 {
-                    if (physicalObjects[frameW * (scaledY) + scaledX + i] == 0)
+                    if ((frameW * (scaledY + j) + scaledX + i < physicalObjects.Length) &&
+                        physicalObjects[(int) (frameW * (scaledY + j) + scaledX + i * scaleX)] == 0
+                        && pixelBuffer[4 * (j * colliderRender.GetWidth() + i + 1) - 1] > 0)
                     {
                         return true;
                     }

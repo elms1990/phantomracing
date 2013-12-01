@@ -99,7 +99,8 @@ namespace PhantomRacing
                 {
                     if (mParent.GetId().Contains("player"))
                     {
-                        int jjj = 0;
+                        mTransform.Position.X -= Speed.X * timeStep;
+                        mTransform.Position.Y -= Speed.Y * timeStep;
                     }
                 }
             }

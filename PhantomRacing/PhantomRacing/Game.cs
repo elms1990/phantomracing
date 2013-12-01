@@ -39,7 +39,7 @@ namespace PhantomRacing
 
         private const int REFERENCE_DISTANCE = 120;
 
-        private PhysicsComponent PhysicsDebug;
+        //private PhysicsComponent PhysicsDebug;
 
         public Game()
         {
