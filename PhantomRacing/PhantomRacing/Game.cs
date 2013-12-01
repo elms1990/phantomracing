@@ -39,6 +39,8 @@ namespace PhantomRacing
 
         private const int REFERENCE_DISTANCE = 120;
 
+        private PhysicsComponent PhysicsDebug;
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -117,6 +119,11 @@ namespace PhantomRacing
                 mPlayers[i].Initialize();
             }
 
+            //if (Globals.DEBUG)
+            //{
+            //    PhysicsDebug = (PhysicsComponent)mPlayers[0].GetComponent("Physics");
+            //}
+
             mKinect.StartKinect();
         }
 
@@ -169,6 +176,9 @@ namespace PhantomRacing
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
 
+            //spriteBatch.DrawString(mFont, "Vx: " + PhysicsDebug.Speed.X + " Vy: " + PhysicsDebug.Speed.Y,
+                    //Vector2.Zero, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.99f);
+
             if (mKinect.GetArena() != null)
             {
                 spriteBatch.Draw(mKinect.GetArena(), mBlittingRectangle, null, Color.White,
@@ -180,8 +190,6 @@ namespace PhantomRacing
                 mPlayers[i].Render(spriteBatch);
             }
 
-            spriteBatch.DrawString(mFont, "Max Depth: " + mKinect.GetMaxDepth(), Vector2.Zero, Color.Black,
-                0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.99f);
             spriteBatch.End();
         }
     }

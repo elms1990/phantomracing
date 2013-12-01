@@ -14,6 +14,9 @@ namespace PhantomRacing
         // Collided center vector
         private static Vector2 sCenterVec2 = new Vector2();
 
+        // TimeStep
+        public static float TimeStep = 0;
+
         public static bool Collide(GameObject collider, CollisionType colliderType, 
             GameObject collided, CollisionType collidedType)
         {
@@ -26,8 +29,10 @@ namespace PhantomRacing
                     {
                         TransformComponent colliderTransform = (TransformComponent)collider.GetComponent("Transform");
                         RenderComponent colliderRender = (RenderComponent)collider.GetComponent("Render");
+                        PhysicsComponent colliderPhysics = (PhysicsComponent)collider.GetComponent("Physics");
                         TransformComponent collidedTransform = (TransformComponent)collided.GetComponent("Transform");
                         RenderComponent collidedRender = (RenderComponent)collided.GetComponent("Render");
+                        PhysicsComponent collidedPhysics = (PhysicsComponent)collided.GetComponent("Physics");
                         
                         collide = TestCircleCircleCollision((int)(colliderTransform.Position.X + colliderRender.GetWidth() / 2),
                             (int)(colliderTransform.Position.Y + colliderRender.GetHeight() / 2),
@@ -38,8 +43,8 @@ namespace PhantomRacing
 
                         if (collide)
                         {
-                            MoveOut(colliderTransform, colliderRender.GetWidth() / 2,
-                                collidedTransform, collidedRender.GetWidth() / 2);
+                            MoveOut(colliderTransform, colliderRender.GetWidth() / 2, colliderPhysics,
+                                collidedTransform, collidedRender.GetWidth() / 2, collidedPhysics);
                         }
                     }
                     break;   
@@ -67,49 +72,29 @@ namespace PhantomRacing
                 return false;
             }
 
-
             for (int j = 0; j < colliderRender.GetHeight(); j++)
             {
                 for (int i = 0; i < colliderRender.GetWidth(); i++)
                 {
-                    if (physicalObjects[frameW * scaledY + scaledX + i] == 0)
+                    if (physicalObjects[frameW * (scaledY) + scaledX + i] == 0)
                     {
                         return true;
                     }
                 }
-            }
 
-            // Top check
-            //for (int i = 0; i < colliderRender.GetWidth(); i++)
-            //{
-            //    if (physicalObjects[scaledY * frameW + i] == 0)
-            //    {
-            //        return true;
-            //    }
-            //}
+            }
 
             return false;
         }
 
         private static void MoveOut(TransformComponent colliderTransform, int colliderRadius,
-            TransformComponent collidedTransform, int collidedRadius)
+            PhysicsComponent colliderPhysics,
+            TransformComponent collidedTransform, int collidedRadius,
+            PhysicsComponent collidedPhysics)
         {
-            int dx = (int)(colliderTransform.Position.X - collidedTransform.Position.X);
-            int dy = (int)(colliderTransform.Position.Y - collidedTransform.Position.Y);
-
-            // Left to right collision
-            if (dx < 0)
-            {
-
-            }
-            else
-            {
-                // Right to left collision
-                if (dx > 0)
-                {
-
-                }
-            }
+            // Move back in time    
+            colliderTransform.Position.X -= colliderPhysics.Speed.X * TimeStep;
+            colliderTransform.Position.Y -= colliderPhysics.Speed.Y * TimeStep;
         }
 
         private static bool TestCircleCircleCollision(int colliderCenterX, int colliderCenterY, int colliderRadius,
@@ -124,7 +109,7 @@ namespace PhantomRacing
 
             Vector2.Distance(ref sCenterVec, ref sCenterVec2, out dist);
 
-            return dist <= colliderRadius + collidedRadius;
+            return dist < colliderRadius + collidedRadius;
         }
     }
 }

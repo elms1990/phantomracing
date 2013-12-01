@@ -116,6 +116,7 @@
     <Compile Include="GamePadHandler.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="HealthBar.cs" />
     <Compile Include="IInput.cs" />
     <Compile Include="InputState.cs" />

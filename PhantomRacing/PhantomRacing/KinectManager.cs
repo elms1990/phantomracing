@@ -37,7 +37,7 @@ namespace PhantomRacing
 
         private Texture2D mDepthBuffer = null;
 
-        private int mThreshold = 100;
+        private int mThreshold = Globals.SEPARATION_THRESHOLD;
 
         /// <summary>
         /// Hidden Constructor

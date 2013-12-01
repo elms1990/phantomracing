@@ -55,6 +55,18 @@ namespace PhantomRacing
             return sInstance;
         }
 
+        public HashSet<GameObject> GetRegistered()
+        {
+            HashSet<GameObject> objs = new HashSet<GameObject>();
+
+            foreach (GameObject obj in mRegistered)
+            {
+                objs.Add(obj);
+            }
+
+            return objs;
+        }
+
         /// <summary>
         /// Refreshes objects position in the world.
         /// </summary>
