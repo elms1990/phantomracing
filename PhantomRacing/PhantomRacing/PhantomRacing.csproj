@@ -112,10 +112,13 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="BulletComponent.cs" />
     <Compile Include="CollisionType.cs" />
+    <Compile Include="PlayerPlacementComponent.cs" />
     <Compile Include="Event.cs" />
+    <Compile Include="GameMode.cs" />
     <Compile Include="GamePadHandler.cs" />
     <Compile Include="GameComponent.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="HealthBar.cs" />
     <Compile Include="IInput.cs" />

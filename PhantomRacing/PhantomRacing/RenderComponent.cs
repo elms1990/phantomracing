@@ -39,6 +39,8 @@ namespace PhantomRacing
 
         private Color[] mPixelBuffer;
 
+        public float Alpha = 1f;
+
         public RenderComponent(GameObject parent, Texture2D texture)
             : base("Render")
         {
@@ -97,7 +99,7 @@ namespace PhantomRacing
 
         public override void Render(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(mTexture, mRectangle, null, Color.White,
+            spriteBatch.Draw(mTexture, mRectangle, null, Color.White * Alpha,
                 mTransform.Rotation, Center, SpriteEffects.None, mTransform.Position.Z);
         }
     }

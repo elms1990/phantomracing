@@ -56,6 +56,7 @@ namespace PhantomRacing
             mBoxRenderer = (RenderComponent)GetComponent("HealthBarBoxRender");
             mHealthRenderer = (RenderComponent)GetComponent("HealthBarFillRender");
             mTransform = (TransformComponent)GetComponent("Transform");
+            mTransform.Position.Z = 1f;
             mParentTransform = (TransformComponent)mParent.GetComponent("Transform");
         }
 

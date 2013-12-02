@@ -112,6 +112,11 @@ namespace PhantomRacing
 
                 return;
             }
+
+            if (e.EventName == "Save")
+            {
+                SaveState();
+            }
         }
     }
 }
