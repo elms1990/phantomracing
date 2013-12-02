@@ -33,6 +33,10 @@ namespace PhantomRacing
 
         private int mMinDepth = 0;
 
+        // Destruction mode
+        private bool mNonStop = true;
+        private bool mScanned = false;
+
         private int mMaxDepth = 0;
 
         private Texture2D mDepthBuffer = null;
@@ -96,6 +100,11 @@ namespace PhantomRacing
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
+                if (!mNonStop && mScanned)
+                {
+                    return;
+                }
+
                 if (colorFrame == null)
                 {
                     return;
@@ -129,6 +138,66 @@ namespace PhantomRacing
                 
                 mDepthBuffer.SetData(mColorInformation);
             }
+        }
+
+        public void SetMode(bool nonStop)
+        {
+            mNonStop = nonStop;
+        }
+
+        public void SetScanned(bool scanned)
+        {
+            mScanned = scanned;
+        }
+
+        public bool IsNonStopMode()
+        {
+            return mNonStop;
+        }
+
+        public void PurgeRegion(GameObject collider, byte[] physicalObjects, float scaleX, float scaleY)
+        {
+            TransformComponent colliderTransform = (TransformComponent)collider.GetComponent("Transform");
+            RenderComponent colliderRender = (RenderComponent)collider.GetComponent("Render");
+            int scaledX = (int)(scaleX * colliderTransform.Position.X);
+            int scaledY = (int)(scaleY * colliderTransform.Position.Y);
+            int scaledW = (int)(scaleX * colliderRender.GetWidth());
+            int scaledH = (int)(scaleY * colliderRender.GetHeight());
+            int frameW = KinectManager.GetInstance().GetColorFrameWidth();
+            int frameH = KinectManager.GetInstance().GetColorFrameHeight();
+            Color[] pixelBuffer = colliderRender.GetPixelBuffer();
+
+            // Prevents out of index issues, because out of window verification is
+            // done after this step.
+            if (scaledX < 0 || scaledY < 0 || scaledX + scaledW >= frameW || scaledY + scaledH >= frameH)
+            {
+                return;
+            }
+
+            //for (int j = 0; j < colliderRender.GetHeight() * 0.45; j++)
+            //{
+            //    for (int i = 0; i < colliderRender.GetWidth() * 0.9; i++)
+            //    {
+            //        //physicalObjects[(int)(frameW * (scaledY + j) + scaledX + i * scaleX)] = 0xff;
+            //    }
+
+            //}
+
+             //mDepthBuffer = new Texture2D(Renderer.GetInstance().GetGraphicsDevice(),
+             //       mKinectSensor.ColorStream.FrameWidth, mKinectSensor.ColorStream.FrameHeight);
+
+             //   for (int i = 0; i < physicalObjects.Length; i ++)
+             //   {
+             //       uint pixel = (uint)(physicalObjects[i]);
+
+             //       mColorInformation[i] = 0;
+             //       mColorInformation[i + 1] = 0;
+             //       mColorInformation[i + 2] = 0;
+             //       mColorInformation[i + 3] = (byte)(0xff - (byte)pixel);
+             //       mArena[i / 4] = (byte)pixel;
+             //   }
+                
+             //   mDepthBuffer.SetData(mColorInformation);
         }
 
         private void DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)

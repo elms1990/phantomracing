@@ -32,7 +32,7 @@ namespace PhantomRacing
         // Use this to draw stuff on the screen.
         private SpriteBatch spriteBatch;
 
-        private static readonly int mNumberOfPlayers = 3;
+        private static readonly int mNumberOfPlayers = 2;
 
         // Playerlist
         private Player[] mPlayers = new Player[mNumberOfPlayers];
@@ -48,6 +48,7 @@ namespace PhantomRacing
         private uint mMenuPos = 0;
         private Vector2 mItemPos = new Vector2();
         private bool mSelected = false;
+        private bool mArenaSelected = false;
 
         public Game()
         {
@@ -146,11 +147,18 @@ namespace PhantomRacing
                 if (mMenuPos == 0)
                 {
                     mCurrentGameState = GameState.PlayerPlacementStart;
+                    mKinect.SetMode(true);
                 }
                 else
                 {
+                    mKinect.SetMode(false);
                     mCurrentGameState = GameState.ArenaScan;
                 }
+            }
+
+            if (mCurrentGameState == GameState.ArenaScan && mArenaSelected)
+            {
+                mCurrentGameState = GameState.PlayerPlacementStart;
             }
 
             switch (mCurrentGameState)
@@ -164,6 +172,7 @@ namespace PhantomRacing
                     break;
 
                 case GameState.ArenaScan:
+                    ArenaScanningUpdate(gameTime);
                     break;
 
                 case GameState.PlayerPlacementStart:
@@ -172,6 +181,10 @@ namespace PhantomRacing
 
                 case GameState.PlayerPlacementRunning:
                     PlayerPlacementRunningUpdate(gameTime);
+                    break;
+
+                case GameState.RunningStart:
+                    RunningStartUpdate(gameTime);
                     break;
 
                 case GameState.Running:
@@ -213,14 +226,36 @@ namespace PhantomRacing
                     break;
 
                 case GameState.ArenaScan:
+                    ArenaScanningDraw();
                     break;
 
+                case GameState.RunningStart:
                 case GameState.Running:
                     RunningDraw();
                     break;
             }
 
             spriteBatch.End();
+        }
+
+        private void ArenaScanningDraw()
+        {
+            if (mKinect.GetArena() != null)
+            {
+                spriteBatch.Draw(mKinect.GetArena(), mBlittingRectangle, null, Color.White,
+                    0, Vector2.Zero, SpriteEffects.None, 1);
+            }
+        }
+
+        private void ArenaScanningUpdate(GameTime gameTime)
+        {
+            InputState iS = mKeyboard.GetState();
+
+            if (iS.IsJustPressed("p1_shoot"))
+            {
+                mKinect.SetScanned(true);
+                mArenaSelected = true;
+            }
         }
 
         private void PlayerPlacementStartUpdate(GameTime gameTime)
@@ -253,9 +288,23 @@ namespace PhantomRacing
 
         private void PlayerPlacementRunningUpdate(GameTime gameTime)
         {
+            int placed = 0;
+
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
+
+                if ((mPlayers[i].GetComponent("PlayerPlacement") as PlayerPlacementComponent).IsPlaced())
+                {
+                    placed++;
+                }
+            }
+
+            if (placed == mPlayers.Length)
+            {
+                mEvent.EventName = "Save";
+                GameObject.BroadcastEvent(mEvent);
+                mCurrentGameState = GameState.RunningStart;
             }
         }
 
@@ -268,19 +317,19 @@ namespace PhantomRacing
         {
             InputState state = mKeyboard.GetState();
 
-            if (state.IsJustPressed("p1_down"))
+            if (state.IsPressed("p1_down"))
             {
                 mMenuPos = 1;
             }
             else
             {
-                if (state.IsJustPressed("p1_up"))
+                if (state.IsPressed("p1_up"))
                 {
                     mMenuPos = 0;
                 }
             }
 
-            if (state.IsJustPressed("p1_shoot"))
+            if (state.IsPressed("p1_shoot"))
             {
                 mSelected = true;
             }
@@ -313,7 +362,30 @@ namespace PhantomRacing
             mItemPos.X = Renderer.GetInstance().GetWidth() / 2 - size.X / 2;
             mItemPos.Y = Renderer.GetInstance().GetHeight() / 2 + size.Y + 4;
             spriteBatch.DrawString(mFont, "Destruction", mItemPos, Color.White * dsAlpha);
-        }   
+        }
+
+        private void RunningStartUpdate(GameTime gameTime)
+        {
+            for (int i = 0; i < mPlayers.Length; i++)
+            {
+                mPlayers[i].RemoveComponent("PlayerPlacement").
+                    AddComponent(new PlayerInputComponent(mPlayers[i], i + 1)).
+                    AddComponent(new BulletComponent(mPlayers[i])).
+                    AddComponent(new PhysicsComponent(mPlayers[i], CollisionType.Circle,
+                        "player", new List<string>() { "player", "bullet" })).
+                    //AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player" + (i + 1))));
+                AddComponent(new LifeComponent(mPlayers[i], 30, 30));
+                //mPlayers[i].Index = (PlayerIndex)(i + 1);
+
+                //((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = 75 + i * 300;
+                //((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.Y = 300 + i * 120;
+
+                mPlayers[i].Initialize();
+                //mPlayers[i].SaveState();
+            }
+
+            mCurrentGameState = GameState.Running;
+        }
 
         private void RunningUpdate(GameTime gameTime)
         {

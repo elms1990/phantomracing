@@ -7,6 +7,6 @@ namespace PhantomRacing
 {
     public enum GameState
     {
-        PreGame, ModeSelection, PlayerPlacementStart, PlayerPlacementRunning, ArenaScan, Running
+        PreGame, ModeSelection, PlayerPlacementStart, PlayerPlacementRunning, ArenaScan, RunningStart, Running
     }
 }
