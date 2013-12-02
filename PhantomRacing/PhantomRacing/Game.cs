@@ -87,18 +87,35 @@ namespace PhantomRacing
             KeyboardHandler.CreateInstance();
             mKeyboard = KeyboardHandler.GetInstance();
 
+            GamePadHandler.CreateInstance();
+
             // Initialize Kinect
             KinectManager.CreateInstance();
             mKinect = KinectManager.GetInstance();
 
             // Load default keys for player 1
-            KeyboardHandler.GetInstance().Map("p1_up", Keys.W)
-                .Map("p1_left", Keys.A)
-                .Map("p1_down", Keys.S)
-                .Map("p1_right", Keys.D)
-                .Map("p1_rleft", Keys.Left)
-                .Map("p1_rright", Keys.Right)
-                .Map("p1_shoot", Keys.Up);
+            GamePadHandler.GetInstance().MapPlayer("p1_up", Buttons.LeftThumbstickUp, PlayerIndex.One).
+                MapPlayer("p1_left", Buttons.LeftThumbstickLeft, PlayerIndex.One).
+                MapPlayer("p1_down", Buttons.LeftThumbstickDown, PlayerIndex.One).
+                MapPlayer("p1_right", Buttons.LeftThumbstickRight, PlayerIndex.One).
+                MapPlayer("p1_rleft", Buttons.LeftTrigger, PlayerIndex.One).
+                MapPlayer("p1_rright", Buttons.RightTrigger, PlayerIndex.One).
+                MapPlayer("p1_shoot", Buttons.A, PlayerIndex.One);
+
+            GamePadHandler.GetInstance().MapPlayer("p2_up", Buttons.LeftThumbstickUp, PlayerIndex.Two).
+                MapPlayer("p2_left", Buttons.LeftThumbstickLeft, PlayerIndex.Two).
+                MapPlayer("p2_down", Buttons.LeftThumbstickDown, PlayerIndex.Two).
+                MapPlayer("p2_right", Buttons.LeftThumbstickRight, PlayerIndex.Two).
+                MapPlayer("p2_rleft", Buttons.LeftTrigger, PlayerIndex.Two).
+                MapPlayer("p2_rright", Buttons.RightTrigger, PlayerIndex.Two).
+                MapPlayer("p2_shoot", Buttons.A, PlayerIndex.Two);
+            //KeyboardHandler.GetInstance().Map("p1_up", Keys.W)
+            //    .Map("p1_left", Keys.A)
+            //    .Map("p1_down", Keys.S)
+            //    .Map("p1_right", Keys.D)
+            //    .Map("p1_rleft", Keys.Left)
+            //    .Map("p1_rright", Keys.Right)
+            //    .Map("p1_shoot", Keys.Up);
 
             // Load default keys for player 2
             KeyboardHandler.GetInstance().Map("p2_up", Keys.NumPad8)
@@ -140,6 +157,7 @@ namespace PhantomRacing
             base.Update(gameTime);
 
             mKeyboard.Update();
+            GamePadHandler.GetInstance().Update();
 
             if (mCurrentGameState == GameState.ModeSelection &&
                 mSelected)
@@ -249,7 +267,7 @@ namespace PhantomRacing
 
         private void ArenaScanningUpdate(GameTime gameTime)
         {
-            InputState iS = mKeyboard.GetState();
+            InputState iS = GamePadHandler.GetInstance().GetState(PlayerIndex.One);
 
             if (iS.IsJustPressed("p1_shoot"))
             {
@@ -315,7 +333,7 @@ namespace PhantomRacing
 
         private void ModeSelectUpdate(GameTime gameTime)
         {
-            InputState state = mKeyboard.GetState();
+            InputState state = GamePadHandler.GetInstance().GetState(PlayerIndex.One);
 
             if (state.IsPressed("p1_down"))
             {

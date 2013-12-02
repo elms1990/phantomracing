@@ -155,8 +155,11 @@ namespace PhantomRacing
             return mNonStop;
         }
 
-        public void PurgeRegion(GameObject collider, byte[] physicalObjects, float scaleX, float scaleY)
+        public void PurgeRegion(GameObject collider)
         {
+            float scaleX = ((float)GetColorFrameWidth()) / Renderer.GetInstance().GetWidth();
+            float scaleY = ((float)GetColorFrameHeight()) / Renderer.GetInstance().GetHeight();
+
             TransformComponent colliderTransform = (TransformComponent)collider.GetComponent("Transform");
             RenderComponent colliderRender = (RenderComponent)collider.GetComponent("Render");
             int scaledX = (int)(scaleX * colliderTransform.Position.X);
@@ -174,30 +177,17 @@ namespace PhantomRacing
                 return;
             }
 
-            //for (int j = 0; j < colliderRender.GetHeight() * 0.45; j++)
-            //{
-            //    for (int i = 0; i < colliderRender.GetWidth() * 0.9; i++)
-            //    {
-            //        //physicalObjects[(int)(frameW * (scaledY + j) + scaledX + i * scaleX)] = 0xff;
-            //    }
+            for (int j = -4; j < colliderRender.GetHeight() + 4; j++)
+            {
+                for (int i = -4; i < colliderRender.GetWidth() + 4; i++)
+                {
+                    mColorInformation[4 * (int)(frameW * (scaledY + j) + scaledX + i * scaleX) - 1] = 0;
+                    mArena[(int)(frameW * (scaledY + j) + scaledX + i * scaleX)] = 0xff;
+                }
 
-            //}
+            }
 
-             //mDepthBuffer = new Texture2D(Renderer.GetInstance().GetGraphicsDevice(),
-             //       mKinectSensor.ColorStream.FrameWidth, mKinectSensor.ColorStream.FrameHeight);
-
-             //   for (int i = 0; i < physicalObjects.Length; i ++)
-             //   {
-             //       uint pixel = (uint)(physicalObjects[i]);
-
-             //       mColorInformation[i] = 0;
-             //       mColorInformation[i + 1] = 0;
-             //       mColorInformation[i + 2] = 0;
-             //       mColorInformation[i + 3] = (byte)(0xff - (byte)pixel);
-             //       mArena[i / 4] = (byte)pixel;
-             //   }
-                
-             //   mDepthBuffer.SetData(mColorInformation);
+             mDepthBuffer.SetData(mColorInformation);
         }
 
         private void DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)

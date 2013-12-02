@@ -39,7 +39,7 @@ namespace PhantomRacing
             if (!mPlaced)
             {
                 // Input update
-                InputState ks = KeyboardHandler.GetInstance().GetState();
+                InputState ks = GamePadHandler.GetInstance().GetState((PlayerIndex)mPlayerIndex - 1);
 
                 if (ks.IsPressed("p" + mPlayerIndex + "_left"))
                 {

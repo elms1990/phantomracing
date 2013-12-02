@@ -74,13 +74,12 @@ namespace PhantomRacing
             if (e.EventName.CompareTo("collision") == 0 ||
                 e.EventName == "Reset")
             {
-                mParent.MarkRemoval(this);
-
                 if (!KinectManager.GetInstance().IsNonStopMode())
                 {
-                    //KinectManager.GetInstance().PurgeRegion((int)(mTransform.Position.X - 4), (int)(mTransform.Position.Y - 4),
-                    //    mRender.GetWidth() + 4, mRender.GetHeight() + 4);
+                    KinectManager.GetInstance().PurgeRegion(this);
                 }
+
+                mParent.MarkRemoval(this);
             }
         }
     }

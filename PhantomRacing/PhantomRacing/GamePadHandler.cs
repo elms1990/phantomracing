@@ -10,16 +10,19 @@ namespace PhantomRacing
     public class GamePadHandler : IInput
     {
         // Old gamepad state
-        private InputState mOldState = null;
+        private InputState[] mOldState = new InputState[4];
 
         // New keyboard state
-        private InputState mNewState = new InputState();
+        private InputState[] mNewState = new InputState[4];
 
         // Individual key states
-        private LinkedList<String> mPressed, mJustPressed, mReleased, mJustReleased;
+        private LinkedList<String>[] mPressed = new LinkedList<string>[4], 
+            mJustPressed = new LinkedList<string>[4], 
+            mReleased = new LinkedList<string>[4], 
+            mJustReleased = new LinkedList<string>[4];
 
         // Mapped buttons
-        private Dictionary<string, Buttons> mMapped = new Dictionary<string, Buttons>();
+        private Dictionary<string, Buttons>[] mMapped = new Dictionary<string,Buttons>[4];
 
         // Singleton instance
         private static GamePadHandler sInstance = null;
@@ -29,6 +32,11 @@ namespace PhantomRacing
         /// </summary>
         private GamePadHandler()
         {
+            for (int i = 0; i < mMapped.Length; i++)
+            {
+                mMapped[i] = new Dictionary<string, Buttons>();
+                mNewState[i] = new InputState();
+            }
         }
 
         /// <summary>
@@ -51,13 +59,18 @@ namespace PhantomRacing
             return sInstance;
         }
 
+        public InputState GetState()
+        {
+            return null;
+        }
+
         /// <summary>
         /// Retrieves the state of this keyboard.
         /// </summary>
         /// <returns>Current state.</returns>
-        public InputState GetState()
+        public InputState GetState(PlayerIndex index)
         {
-            return mNewState;
+            return mNewState[(int)index];
         }
 
         /// <summary>
@@ -66,10 +79,14 @@ namespace PhantomRacing
         public void Update()
         {
             // Clears old input lists
-            mPressed = new LinkedList<string>();
-            mReleased = new LinkedList<string>();
-            mJustPressed = new LinkedList<string>();
-            mJustReleased = new LinkedList<string>();
+
+            for (int i = 0; i < 4; i++)
+            {
+                mPressed[i] = new LinkedList<string>();
+                mReleased[i] = new LinkedList<string>();
+                mJustPressed[i] = new LinkedList<string>();
+                mJustReleased[i] = new LinkedList<string>();
+            }
 
             // New state is now the old state
             mOldState = mNewState;
@@ -80,42 +97,50 @@ namespace PhantomRacing
                 GamePadState curState = GamePad.GetState(index);
 
                 Buttons b;
-                foreach (string key in mMapped.Keys)
+                foreach (string key in mMapped[(int)index].Keys)
                 {
-                    mMapped.TryGetValue(key, out b);
+                    mMapped[(int)index].TryGetValue(key, out b);
                     if (curState.IsButtonDown(b))
                     {
                         // Was pressed and is currently pressed
-                        if (mOldState.IsJustPressed(key) || mOldState.IsPressed(key))
+                        if (mOldState[(int)index].IsJustPressed(key) || mOldState[(int)index].IsPressed(key))
                         {
-                            mPressed.AddLast(key);
+                            mPressed[(int)index].AddLast(key);
                         }
                         else
                         {
                             // The button was released or just released.
-                            mJustPressed.AddLast(key);
+                            mJustPressed[(int)index].AddLast(key);
                         }
                     }
                     else
                     {
                         // Was released and is currently released
-                        if (mOldState.IsJustPressed(key) || mOldState.IsPressed(key))
+                        if (mOldState[(int)index].IsJustPressed(key) || mOldState[(int)index].IsPressed(key))
                         {
-                            mJustReleased.AddLast(key);
+                            mJustReleased[(int)index].AddLast(key);
                         }
                         else
                         {
                             // The button was released or just released.
-                            mReleased.AddLast(key);
+                            mReleased[(int)index].AddLast(key);
                         }
                     }
                 }
 
             }
 
-            mNewState = new InputState(mPressed, mJustPressed, mReleased, mJustReleased,
-                new LinkedList<KeyValuePair<string, float>>(),
-                new LinkedList<KeyValuePair<string, Vector3>>());
+            for (int i = 0; i < 4; i++)
+            {
+                mNewState[i] = new InputState(mPressed[i], mJustPressed[i], mReleased[i], mJustReleased[i],
+                    new LinkedList<KeyValuePair<string, float>>(),
+                    new LinkedList<KeyValuePair<string, Vector3>>());
+            }
+        }
+
+        public IInput Map(string id, Object button)
+        {
+            return this;
         }
 
         /// <summary>
@@ -124,9 +149,9 @@ namespace PhantomRacing
         /// <param name="id">Id of the virtual key.</param>
         /// <param name="button">Physical key.</param>
         /// <returns>An instance of this class.</returns>
-        public IInput Map(string id, Object button)
+        public GamePadHandler MapPlayer(string id, Object button, PlayerIndex index)
         {
-            mMapped.Add(id, (Buttons)button);
+            mMapped[(int)index].Add(id, (Buttons)button);
 
             return sInstance;
         }
@@ -135,9 +160,14 @@ namespace PhantomRacing
         /// Removes a key from mapping.
         /// </summary>
         /// <param name="id">Virtual key id.</param>
+        public void Unmap(string id, PlayerIndex index)
+        {
+            mMapped[(int)index].Remove(id);
+        }
+
         public void Unmap(string id)
         {
-            mMapped.Remove(id);
+
         }
     }
 }
