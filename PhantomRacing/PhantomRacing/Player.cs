@@ -116,6 +116,15 @@ namespace PhantomRacing
             if (e.EventName == "Save")
             {
                 SaveState();
+
+                return;
+            }
+
+            if (e.EventName == "Heal")
+            {
+                mLifeComponent.TakeDamage(-15);
+
+                return;
             }
         }
     }

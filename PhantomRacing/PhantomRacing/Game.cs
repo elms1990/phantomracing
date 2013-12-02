@@ -38,6 +38,8 @@ namespace PhantomRacing
         private Player[] mPlayers = new Player[mNumberOfPlayers];
         private Event mEvent = new Event();
 
+        private PowerUpGenerator mGenerator;
+
         private Rectangle mBlittingRectangle;
 
         private const int REFERENCE_DISTANCE = 120;
@@ -45,10 +47,15 @@ namespace PhantomRacing
         private GameState mCurrentGameState = GameState.PreGame;
 
         // ModeSelection Stuff
-        private uint mMenuPos = 0;
+        private readonly string[] mMenuOptions = { "Deathmatch", 
+                                                     "Destruction",
+                                                     "Random Drops: OFF"
+                                                 };
+        private int mMenuPos = 0;
         private Vector2 mItemPos = new Vector2();
         private bool mSelected = false;
         private bool mArenaSelected = false;
+        private bool mRandomDrops = false;
 
         public Game()
         {
@@ -100,7 +107,8 @@ namespace PhantomRacing
                 MapPlayer("p1_right", Buttons.LeftThumbstickRight, PlayerIndex.One).
                 MapPlayer("p1_rleft", Buttons.LeftTrigger, PlayerIndex.One).
                 MapPlayer("p1_rright", Buttons.RightTrigger, PlayerIndex.One).
-                MapPlayer("p1_shoot", Buttons.A, PlayerIndex.One);
+                MapPlayer("p1_shoot", Buttons.A, PlayerIndex.One).
+                MapPlayer("p1_reset", Buttons.BigButton, PlayerIndex.One);
 
             GamePadHandler.GetInstance().MapPlayer("p2_up", Buttons.LeftThumbstickUp, PlayerIndex.Two).
                 MapPlayer("p2_left", Buttons.LeftThumbstickLeft, PlayerIndex.Two).
@@ -118,13 +126,13 @@ namespace PhantomRacing
             //    .Map("p1_shoot", Keys.Up);
 
             // Load default keys for player 2
-            KeyboardHandler.GetInstance().Map("p2_up", Keys.NumPad8)
-                .Map("p2_left", Keys.NumPad4)
-                .Map("p2_down", Keys.NumPad2)
-                .Map("p2_right", Keys.NumPad6)
-                .Map("p2_rleft", Keys.NumPad7)
-                .Map("p2_rright", Keys.NumPad9)
-                .Map("p2_shoot", Keys.NumPad5);
+            //KeyboardHandler.GetInstance().Map("p2_up", Keys.NumPad8)
+            //    .Map("p2_left", Keys.NumPad4)
+            //    .Map("p2_down", Keys.NumPad2)
+            //    .Map("p2_right", Keys.NumPad6)
+            //    .Map("p2_rleft", Keys.NumPad7)
+            //    .Map("p2_rright", Keys.NumPad9)
+            //    .Map("p2_shoot", Keys.NumPad5);
 
             mKinect.StartKinect();
         }
@@ -162,15 +170,18 @@ namespace PhantomRacing
             if (mCurrentGameState == GameState.ModeSelection &&
                 mSelected)
             {
-                if (mMenuPos == 0)
+                switch (mMenuPos)
                 {
-                    mCurrentGameState = GameState.PlayerPlacementStart;
-                    mKinect.SetMode(true);
-                }
-                else
-                {
-                    mKinect.SetMode(false);
-                    mCurrentGameState = GameState.ArenaScan;
+                    case 0:
+                          mCurrentGameState = GameState.PlayerPlacementStart;
+                          mKinect.SetMode(true);
+                          break;
+                    case 1:
+                          mKinect.SetMode(false);
+                          mCurrentGameState = GameState.ArenaScan;
+                          break;
+                    default:
+                          break;
                 }
             }
 
@@ -335,62 +346,97 @@ namespace PhantomRacing
         {
             InputState state = GamePadHandler.GetInstance().GetState(PlayerIndex.One);
 
-            if (state.IsPressed("p1_down"))
+            if (state.IsJustPressed("p1_down"))
             {
-                mMenuPos = 1;
+                mMenuPos = (mMenuPos == mMenuOptions.Length - 1) ? mMenuOptions.Length - 1 : mMenuPos + 1;
             }
             else
             {
-                if (state.IsPressed("p1_up"))
+                if (state.IsJustPressed("p1_up"))
                 {
-                    mMenuPos = 0;
+                    mMenuPos = (mMenuPos == 0) ? 0 : mMenuPos - 1;
                 }
             }
 
-            if (state.IsPressed("p1_shoot"))
+            if (state.IsJustPressed("p1_shoot"))
             {
-                mSelected = true;
+                switch (mMenuPos)
+                {
+                    case 0:
+                    case 1:
+                        mSelected = true;
+                        break;
+                    case 2:
+                        if (mRandomDrops)
+                        {
+                            mMenuOptions[2] = "Random Drops: OFF";
+                            mRandomDrops = false;
+                        }
+                        else
+                        {
+                            mMenuOptions[2] = "Random Drops: ON";
+                            mRandomDrops = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
         private void ModeSelectDraw()
         {
-            float dmAlpha = 0.5f;
-            float dsAlpha = 0.5f;
+            int menuHeight = 0;
+            int menuSpacing = 8;
 
-            if (mMenuPos == 0)
+            foreach (string opt in mMenuOptions)
             {
-                dmAlpha = 1f;
-            }
-            else
-            {
-                dsAlpha = 1f;
+                menuHeight += (int)mFont.MeasureString(opt).Y + menuSpacing;
             }
 
-            Vector2 size = mFont.MeasureString("Deathmatch");
+            Vector2 size;
 
             GraphicsDevice.Clear(Color.Black);
 
-            mItemPos.X = Renderer.GetInstance().GetWidth() / 2 - size.X / 2;
-            mItemPos.Y = Renderer.GetInstance().GetHeight() / 2 - size.Y - 4;
-            spriteBatch.DrawString(mFont, "Deathmatch", mItemPos, Color.White * dmAlpha);
+            float alpha;
+            int acc = 0;
 
-            size = mFont.MeasureString("Destruction");
+            for (int i = 0; i < mMenuOptions.Length; i++)
+            {
+                alpha = 0.5f;
+                if (i == mMenuPos)
+                {
+                    alpha = 1f;
+                }
 
-            mItemPos.X = Renderer.GetInstance().GetWidth() / 2 - size.X / 2;
-            mItemPos.Y = Renderer.GetInstance().GetHeight() / 2 + size.Y + 4;
-            spriteBatch.DrawString(mFont, "Destruction", mItemPos, Color.White * dsAlpha);
+                size = mFont.MeasureString(mMenuOptions[i]);
+                mItemPos.X = Renderer.GetInstance().GetWidth() / 2 - size.X / 2;
+                mItemPos.Y = Renderer.GetInstance().GetHeight() / 2 - menuHeight / 2 + acc / 2;
+                acc += (int)(size.Y + menuSpacing);
+                spriteBatch.DrawString(mFont, mMenuOptions[i], mItemPos, Color.White * alpha);
+            }
+            //mItemPos.X = Renderer.GetInstance().GetWidth() / 2 - size.X / 2;
+            //mItemPos.Y = Renderer.GetInstance().GetHeight() / 2 - size.Y - 4;
+            //spriteBatch.DrawString(mFont, "Deathmatch", mItemPos, Color.White * dmAlpha);
+
+            //size = mFont.MeasureString("Destruction");
+
+            //mItemPos.X = Renderer.GetInstance().GetWidth() / 2 - size.X / 2;
+            //mItemPos.Y = Renderer.GetInstance().GetHeight() / 2 + size.Y + 4;
+            //spriteBatch.DrawString(mFont, "Destruction", mItemPos, Color.White * dsAlpha);
         }
 
         private void RunningStartUpdate(GameTime gameTime)
         {
+            //mGenerator = new PowerUpGenerator();
+
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].RemoveComponent("PlayerPlacement").
                     AddComponent(new PlayerInputComponent(mPlayers[i], i + 1)).
                     AddComponent(new BulletComponent(mPlayers[i])).
                     AddComponent(new PhysicsComponent(mPlayers[i], CollisionType.Circle,
-                        "player", new List<string>() { "player", "bullet" })).
+                        "player", new List<string>() { "player", "bullet", "powerup" })).
                     //AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player" + (i + 1))));
                 AddComponent(new LifeComponent(mPlayers[i], 30, 30));
                 //mPlayers[i].Index = (PlayerIndex)(i + 1);
@@ -424,6 +470,7 @@ namespace PhantomRacing
                 GameObject.BroadcastEvent(mEvent);
             }
 
+            //mGenerator.Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);

@@ -112,6 +112,7 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="BulletComponent.cs" />
     <Compile Include="CollisionType.cs" />
+    <Compile Include="HealPowerUp.cs" />
     <Compile Include="PlayerPlacementComponent.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="GameMode.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="PhysicsHelper.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerInputComponent.cs" />
+    <Compile Include="PowerUpGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="RenderComponent.cs" />
