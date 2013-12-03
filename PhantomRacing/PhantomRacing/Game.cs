@@ -58,6 +58,7 @@ namespace PhantomRacing
         private bool mSelected = false;
         private bool mArenaSelected = false;
         private bool mRandomDrops = false;
+        private int[] mScores = new int[mNumberOfPlayers];
 
         public Game()
         {
@@ -216,6 +217,7 @@ namespace PhantomRacing
                     mMenuPos = 0;
                     mArenaSelected = false;
                     mCurrentGameState = GameState.ModeSelection;
+                    mScores = new int[mNumberOfPlayers];
                     break;
 
                 case GameState.ModeSelection:
@@ -484,17 +486,26 @@ namespace PhantomRacing
         {
             // Defeat Condition
             int defeated = 0;
+            int[] killed = new int[mPlayers.Length];
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 if (!mPlayers[i].IsAlive())
                 {
                     defeated++;
                 }
+                else
+                {
+                    killed[i] = 1;
+                }
             }
 
             // Reset
             if (defeated >= mNumberOfPlayers - 1)
             {
+                for (int i = 0; i < mPlayers.Length; i++)
+                {
+                    mScores[i] += killed[i];
+                }
                 mEvent.EventName = "Reset";
                 GameObject.BroadcastEvent(mEvent);
                 //mWorld.Clear();
@@ -509,6 +520,7 @@ namespace PhantomRacing
 
         private void RunningDraw()
         {
+            spriteBatch.DrawString(mFont, "Player 1: " + mScores[0] + " Player 2: " + mScores[1], Vector2.Zero, Color.White);
             if (mGenerator != null)
             {
                 mGenerator.Render(spriteBatch);
