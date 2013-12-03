@@ -43,6 +43,10 @@ namespace PhantomRacing
 
         private int mThreshold = Globals.SEPARATION_THRESHOLD;
 
+        private int MAX_WAIT = 0;
+        private int mCurWait = 0;
+        private bool mCooldown = false;
+
         /// <summary>
         /// Hidden Constructor
         /// </summary>
@@ -96,6 +100,17 @@ namespace PhantomRacing
             mKinectSensor.Start();
         }
 
+        public void Step(int deltaTime)
+        {
+            mCurWait += deltaTime;
+
+            if (mCurWait >= MAX_WAIT)
+            {
+                mCurWait = 0;
+                mCooldown = false;
+            }
+        }
+
         private void ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -105,7 +120,7 @@ namespace PhantomRacing
                     return;
                 }
 
-                if (colorFrame == null)
+                if (colorFrame == null || mCooldown)
                 {
                     return;
                 }
@@ -114,6 +129,20 @@ namespace PhantomRacing
 
                 mDepthBuffer = new Texture2D(Renderer.GetInstance().GetGraphicsDevice(),
                     mKinectSensor.ColorStream.FrameWidth, mKinectSensor.ColorStream.FrameHeight);
+
+                //for (int j = 0; j < mKinectSensor.ColorStream.FrameHeight; j++)
+                //{
+                //    for (int i = 0; i < mKinectSensor.ColorStream.FrameWidth; i++)
+                //    {
+                //        for (int k = 0; k < 4; k++)
+                //        {
+                //            byte old = mColorInformation[j * mKinectSensor.ColorStream.FrameWidth + i + k];
+                //            mColorInformation[j * mKinectSensor.ColorStream.FrameWidth + i + k] =
+                //                mColorInformation[(i + k) * mKinectSensor.ColorStream.FrameHeight + j];
+                //            mColorInformation[(i + k) * mKinectSensor.ColorStream.FrameHeight + j] = old;
+                //        }
+                //    }
+                //}
 
                 for (int i = 0; i < mColorInformation.Length - 3; i += 4)
                 {
@@ -135,9 +164,23 @@ namespace PhantomRacing
                     mColorInformation[i + 3] = (byte)(0xff - (byte)pixel);
                     mArena[i / 4] = (byte)pixel;
                 }
+
+                //for (int j = 0; j < mKinectSensor.ColorStream.FrameHeight; j++)
+                //{
+                //    for (int i = 0; i < mKinectSensor.ColorStream.FrameWidth; i++)
+                //    {
+                //        byte old = mArena[j * mKinectSensor.ColorStream.FrameWidth + i];
+                //        mArena[j * mKinectSensor.ColorStream.FrameWidth + i] =
+                //            mArena[j * mKinectSensor.ColorStream.FrameWidth + mKinectSensor.ColorStream.FrameWidth - i - 1];
+                //        mArena[j * mKinectSensor.ColorStream.FrameWidth + mKinectSensor.ColorStream.FrameWidth - i - 1] = old;
+
+                //    }
+                //}
                 
                 mDepthBuffer.SetData(mColorInformation);
             }
+
+            mCooldown = true;
         }
 
         public void SetMode(bool nonStop)

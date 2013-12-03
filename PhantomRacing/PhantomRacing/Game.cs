@@ -25,12 +25,14 @@ namespace PhantomRacing
         private AssetLoader mAssetLoader;
 
         private SpriteFont mFont;
+        private Texture2D mFloor;
 
         // Object reference to GraphicsDevice.
         private GraphicsDeviceManager graphics;
 
         // Use this to draw stuff on the screen.
         private SpriteBatch spriteBatch;
+        private Rectangle mScreenRect = new Rectangle();
 
         private static readonly int mNumberOfPlayers = 2;
 
@@ -48,8 +50,8 @@ namespace PhantomRacing
 
         // ModeSelection Stuff
         private readonly string[] mMenuOptions = { "Deathmatch", 
-                                                     "Destruction",
-                                                     "Random Drops: OFF"
+                                                     "Destruction"
+                                                     
                                                  };
         private int mMenuPos = 0;
         private Vector2 mItemPos = new Vector2();
@@ -62,7 +64,11 @@ namespace PhantomRacing
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
             graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
-            //graphics.ToggleFullScreen();
+
+            if (Globals.FULL_SCREEN)
+            {
+                graphics.ToggleFullScreen();
+            }
             Content.RootDirectory = "Content";
 
             mBlittingRectangle = new Rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -108,7 +114,7 @@ namespace PhantomRacing
                 MapPlayer("p1_rleft", Buttons.LeftTrigger, PlayerIndex.One).
                 MapPlayer("p1_rright", Buttons.RightTrigger, PlayerIndex.One).
                 MapPlayer("p1_shoot", Buttons.A, PlayerIndex.One).
-                MapPlayer("p1_reset", Buttons.BigButton, PlayerIndex.One);
+                MapPlayer("p1_reset", Buttons.Start, PlayerIndex.One);
 
             GamePadHandler.GetInstance().MapPlayer("p2_up", Buttons.LeftThumbstickUp, PlayerIndex.Two).
                 MapPlayer("p2_left", Buttons.LeftThumbstickLeft, PlayerIndex.Two).
@@ -134,6 +140,9 @@ namespace PhantomRacing
             //    .Map("p2_rright", Keys.NumPad9)
             //    .Map("p2_shoot", Keys.NumPad5);
 
+            mFloor = AssetLoader.GetInstance().LoadAsset<Texture2D>("floor");
+            mScreenRect.Width = WINDOW_WIDTH;
+            mScreenRect.Height = WINDOW_HEIGHT;
             mKinect.StartKinect();
         }
 
@@ -166,6 +175,12 @@ namespace PhantomRacing
 
             mKeyboard.Update();
             GamePadHandler.GetInstance().Update();
+            mKinect.Step(gameTime.ElapsedGameTime.Milliseconds);
+
+            if (GamePadHandler.GetInstance().GetState(PlayerIndex.One).IsJustPressed("p1_reset"))
+            {
+                mCurrentGameState = GameState.PreGame;
+            }
 
             if (mCurrentGameState == GameState.ModeSelection &&
                 mSelected)
@@ -193,6 +208,13 @@ namespace PhantomRacing
             switch (mCurrentGameState)
             {
                 case GameState.PreGame:
+                    mWorld.Clear();
+                    mGenerator = new PowerUpGenerator();
+                    mKinect.SetMode(true);
+                    mKinect.SetScanned(false);
+                    mSelected = false;
+                    mMenuPos = 0;
+                    mArenaSelected = false;
                     mCurrentGameState = GameState.ModeSelection;
                     break;
 
@@ -224,6 +246,8 @@ namespace PhantomRacing
             mWorld.Update();
         }
 
+
+        static int count = 0;
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -234,7 +258,10 @@ namespace PhantomRacing
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
-
+            if (Globals.DEBUG && gameTime.ElapsedGameTime.Milliseconds > 0)
+            {
+                spriteBatch.DrawString(mFont, "FPS: " + 1000 / gameTime.ElapsedGameTime.Milliseconds + " Count: " + count++, Vector2.Zero, Color.Red);
+            }
             switch (mCurrentGameState)
             {
                 case GameState.PreGame:
@@ -301,6 +328,7 @@ namespace PhantomRacing
                     AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player" + (i + 1))));
                     //AddComponent(new LifeComponent(mPlayers[i], 30, 30));
                 mPlayers[i].Index = (PlayerIndex)(i + 1);
+                (mPlayers[i].GetComponent("Render") as RenderComponent).Alpha = 0.45f;
 
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = 75 + i * 300;
                 ((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.Y = 300 + i * 120;
@@ -428,7 +456,8 @@ namespace PhantomRacing
 
         private void RunningStartUpdate(GameTime gameTime)
         {
-            //mGenerator = new PowerUpGenerator();
+            //mGenerator.AddComponent(new TransformComponent()).
+            //    AddComponent(new RenderComponent(mGenerator, new Texture2D(GraphicsDevice, 1, 1)));
 
             for (int i = 0; i < mPlayers.Length; i++)
             {
@@ -439,7 +468,7 @@ namespace PhantomRacing
                         "player", new List<string>() { "player", "bullet", "powerup" })).
                     //AddComponent(new RenderComponent(mPlayers[i], Content.Load<Texture2D>("player" + (i + 1))));
                 AddComponent(new LifeComponent(mPlayers[i], 30, 30));
-                //mPlayers[i].Index = (PlayerIndex)(i + 1);
+                (mPlayers[i].GetComponent("Render") as RenderComponent).Alpha = 1f;
 
                 //((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.X = 75 + i * 300;
                 //((TransformComponent)mPlayers[i].GetComponent("Transform")).Position.Y = 300 + i * 120;
@@ -468,9 +497,10 @@ namespace PhantomRacing
             {
                 mEvent.EventName = "Reset";
                 GameObject.BroadcastEvent(mEvent);
+                //mWorld.Clear();
             }
 
-            //mGenerator.Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
+            mGenerator.Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             for (int i = 0; i < mPlayers.Length; i++)
             {
                 mPlayers[i].Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
@@ -479,10 +509,20 @@ namespace PhantomRacing
 
         private void RunningDraw()
         {
+            if (mGenerator != null)
+            {
+                mGenerator.Render(spriteBatch);
+            }
+            if (Globals.DRAW_BACKGROUND)
+            {
+                spriteBatch.Draw(mFloor, mScreenRect, null, Color.White, 0f, Vector2.Zero,
+                    SpriteEffects.None, 1f);
+            }
+
             if (mKinect.GetArena() != null)
             {
                 spriteBatch.Draw(mKinect.GetArena(), mBlittingRectangle, null, Color.White,
-                    0, Vector2.Zero, SpriteEffects.None, 1);
+                    0, Vector2.Zero, SpriteEffects.None, 0.99f);
             }
 
             for (int i = 0; i < mPlayers.Length; i++)

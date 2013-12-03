@@ -222,9 +222,15 @@ namespace PhantomRacing
         /// </summary>
         public void BroadcastEvent(Event e)
         {
-            foreach (GameObject go in mRegistered)
+            try
             {
-                go.ReceiveEvent(e);
+                foreach (GameObject go in mRegistered)
+                {
+                    go.ReceiveEvent(e);
+                }
+            }
+            catch (Exception)
+            {
             }
         }
     }

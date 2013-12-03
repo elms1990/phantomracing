@@ -82,10 +82,13 @@ namespace PhantomRacing
             KinectManager kinect = KinectManager.GetInstance();
             Renderer renderer = Renderer.GetInstance();
 
-            bool collided = PhysicsHelper.CheckPixelCollision(mParent, kinect.GetRawArena(),
-               ((float)kinect.GetColorFrameWidth()) / renderer.GetWidth(),
-                ((float)kinect.GetColorFrameHeight()) / renderer.GetHeight());
-
+            bool collided = false;
+            if (mParent.GetComponent("Physics") != null)
+            {
+                collided = PhysicsHelper.CheckPixelCollision(mParent, kinect.GetRawArena(),
+                   ((float)kinect.GetColorFrameWidth()) / renderer.GetWidth(),
+                    ((float)kinect.GetColorFrameHeight()) / renderer.GetHeight());
+            }
             if (collided)
             {
                 if (mParent.GetId() == "Bullet")

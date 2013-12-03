@@ -7,8 +7,16 @@ namespace PhantomRacing
 {
     public class HealPowerUp : GameObject
     {
-        public HealPowerUp() : base("HealPowerUp") 
+        private PowerUpGenerator mParent;
+
+        public HealPowerUp(PowerUpGenerator parent) : base("HealPowerUp") 
         {
+            mParent = parent;
+        }
+
+        public override void Render(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        {
+            base.Render(spriteBatch);
         }
 
         protected override void OnEvent(Event e)
@@ -16,8 +24,20 @@ namespace PhantomRacing
             if (e.EventName == "collision" &&
                 e.Sender.GetId().Contains("player"))
             {
-                e.EventName = "Receive";
+                e.EventName = "Heal";
+                e.Receiver = e.Sender;
                 e.Sender.SendEvent(e);
+
+                World.GetInstance().Remove(this);
+                mParent.Remove(this);
+
+                return;
+            }
+
+            if (e.EventName == "Reset")
+            {
+                World.GetInstance().Remove(this);
+                mParent.Remove(this);
             }
         }
     }
