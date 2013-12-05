@@ -1,0 +1,227 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[ansinew]{inputenc}
+\usepackage[portuges,brazil,english]{babel}
+\usepackage{model}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage[options]{algorithm2e}
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+\date{}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+\ifcvprfinal\pagestyle{empty}\fi
+
+\newcommand{\cmd}[1]{\begin{verbatim}#1\end{verbatim}}
+\newcommand{\TODO}[1]{TODO: #1}
+\newcommand{\CITEONE}[2]{\mbox{#1 \cite{#2}}}
+\newcommand{\CITETWO}[3]{\mbox{#1 and #2 \cite{#3}}}
+\newcommand{\CITEN}[2]{\mbox{#1 et al. \cite{#2}}}
+
+\begin{document}
+
+% Cover
+\title{Projeto Final de Graduação
+    \\[3in]
+Realidade Aumentada:\\ Uma Abordagem Utilizando Kinect} 
+\maketitle
+\vfill
+\author{Erick Luis Moraes de Sousa}
+\thispagestyle{empty}
+\newpage
+
+%\null
+%\vfill
+%\hfill "The man in black fled
+
+%\hfill across the desert and
+
+%\hfill the gunslinger followed."
+
+%\hfill - \emph{Stephen King, The Gunslinger.}
+%\newpage
+
+\section{Resumo}
+
+
+\section{Introdução}
+O mercado de games é, atualmente, o ramo de entretenimento que mais gera receita,
+chegando a ultrapassar os lucros obtidos pela indústria cinematográfica
+e musical juntas . O consumo deste conteúdo ocorre nas mais
+diversas plataformas, como Consoles, PCs, Celulares e Tablets. Serviços de venda
+de games digitais, como a Steam\cite{data_steam} e a Origin\cite{data_origin}, tornaram-se
+indispensáveis para este nicho de consumidores. 
+
+Em uma tentativa de continuar inovando, as empresas de vanguarda da atual geração de consoles 
+(Sony, Nintendo e Microsoft) resolveram apostar em uma nova forma de entretenimento, 
+que permitiria que o usuário interagisse com o sistema de maneira mais interativa. 
+A saída encontrada estava em reformular o componente mais clássico dos consoles: O Controle.
+
+Neste projeto, iremos nos restringir ao uso do periférico Kinect\cite{data_kinect} da Microsoft
+para desenvolver um game de batalha 2D (com suporte para até 4 jogadores) utilizando Realidade Aumentada.
+Os participantes do jogo se enfrentam em uma arena customizável, criada a partir
+de simples objetos encontrados em casa, dispostos sobre uma superfície plana.
+
+Durante a fase de implementação, utilizou-se a linguagem C\#, a Framework XNA 4.0\cite{data_xna} e
+a biblioteca do Kinect em C\#. Para este fim uma Game Engine foi implementada,
+com o intuito de proporcionar uma maior modularização e flexibilidade do projeto. A Seção
+\ref{sec:game_engine} contém maiores detalhes sobre a organizar estrutural da mesma.
+
+\section{Motivações}
+\begin{itemize}
+    \item Realidade Virtual é um ramo ainda pouco explorado, porém
+        propício a inovação
+    \item Baixo custo de desenvolvimento
+    \item Problemas dinâmicos e em tempo real, os quais
+        requerem soluções criativas e eficientes
+    \item Lucrativo
+    \item Aplicação e desenvolvimento de técnicas do estado da arte
+\end{itemize}
+
+\section{Metodologia}
+
+A priori procurou-se levantar os principais problemas que poderiam ser encontrados
+durante o desenvolvimento. Podemos citar como exemplo a detecção dos objetos em
+si pelo Kinect e em como realizar a colisão entre um objeto físico e um objeto virtual.
+Após o levantamento, estudamos maneiras de solucionar os problemas encontrados tendo
+sempre em vista a necessidade de fluidez do jogo, portanto nossas abordagens deveriam
+ser computacionalmente baratas. Para garantir a execução uniforme do jogo em diversos
+hardwares, a atualização dos objetos do jogo foram implementadas com base no tempo
+decorrido desde a última renderização e não frame-a-frame. A primeira abordagem garante
+que tanto sistemas mais lentos como mais rápidos sejam executados de forma igual, pois
+o atraso é compensado em uma maior mudança, como por exemplo, no deslocamento de 
+um objeto.
+
+O próximo passo consistiu em estruturar uma Game Engine que fosse flexível o suficiente
+para suportar o gráu de customização necessário por um jogo. Um modelo orientado
+a componentes\cite{data_engine_model} foi escolhido e as razões para tal escolha serão apresentadas na próxima seção.
+
+Com a Game Engine criada, restavam apenas dois passos: o Scanner da Arena e a implementação
+de um módulo de física. Para o Scanner de Arena, testamos o uso do sensor de profundidade
+e a câmera de cor. No caso do sensor de profundidade, o ruído capturado pelo sensor durante
+a execução do projeto tornou sua utilização inviável, portanto restringiu-se o uso da câmera
+de cor. Tratou-se o problema utilizando algorítmos de limiarização. Dada a necessidade de
+manter um gameplay suave, optou-se por descartar técnicas de limiarização local, como o
+método de Niblack(1986) e Sauvola e Pitaksinen(2000).
+
+\subsection{Game Engine}\label{sec:game_engine}
+
+Apesar da enorme quantidade de Game Engines disponíveis\cite{data_engines}, escolhemos
+por desenvolver a nossa própria utilizando a Framework XNA 4.0 como base, pois ela já
+provém diversas primitivas, como carregamento de texturas, renderização e um Game Loop (Figura \ref{fig:gameloop})
+estável. 
+
+A estrutura da Game Engine está descrita na Figura \ref{fig:engine}. Os módulos
+estão descritos a seguir:
+
+\begin{itemize}
+    \item Renderer: Este componente é responsável por criar uma interface entre
+    o dispositivo de renderização e o mundo do jogo.
+    \item Asset Loader: O Asset Loader é um wrapper em torno da classe 
+    de gerenciamento de conteúdo do XNA, porém de escopo global.
+    \item Keyboard Handler: Detecta o estado atual das teclas, armazenando
+    as informações em uma estrutura comum a todos os inputs.
+    \item GamePad Handler: Possui o mesmo objetivo que o Keyboard Handler, porém
+    relativo a controles de Xbox360.
+    \item Kinect Manager: Contém a implementação de uma interface de comunicação
+    entre o Kinect e o Game, bem como o processamento das imagens do Scanner.
+    \item World: A classe World mantém uma referência para todos os objetos
+    ativos do jogo. Para a implementação desta técnica, foi utilizado o
+    algorítmo de Spatial 2D Hash\cite{data_spatialhash}, o qual subdivide o espaço do mundo em
+    buckets de tamanho fixo. Objetos próximos são armazenados em buckets próximos. A Figura \ref{fig:sh}
+    exemplifica o particionamento de um espaço em grid utilizando o Spatial 2D Hash, node os
+    buckets 1, 2 e 7 contém, respectivamente, os conjuntos de bolinhas (vermelho), (vermelho, azul),
+    (azul).
+    
+\end{itemize}
+
+\begin{figure}
+\centering
+	\includegraphics[width=0.99\columnwidth]{figs/gameloop}
+	\caption{XNA Game Loop\cite{data_gameloop}\label{fig:gameloop}}   
+\end{figure} 
+
+\begin{figure}
+\centering
+	\includegraphics[width=0.99\columnwidth]{figs/engine}
+	\caption{Arquitetura da Game Engine\label{fig:engine}}   
+\end{figure}
+
+\begin{figure}
+\centering
+    \includegraphics[width=0.5\columnwidth]{figs/sh}
+	\caption{Partição espacial utilizando o algorítmo de Hash.\label{fig:sh}}   
+\end{figure}
+
+Todos os componentes da Engine foram implementados como Singleton\cite{singleton}, para garantir sua unicidade
+durante a execução e o acesso global a suas propriedades.
+
+\subsubsection{Game Objects e Game Components}
+
+A principal forma de interação com o mundo do jogo se dá através de objetos da classe
+Game Object. Estes objetos têm como intuito envelopar funcionalidades,
+interagir com o mundo, realizar a troca de mensagens e tratar eventos. Afim de
+possibilitar uma maior flexibilidade, pode-se utilizar o operador de herança e
+estender diretamente esta classe. 
+
+Os Game Components implementam o comportamento em si que deseja-se atribuir
+a um determinado Game Object. A seguir descrevemos os principais comportamentos
+implementados:
+
+\begin{itemize}
+    \item Transform: Responsável por armazenar a posição do jogador no mundo,
+    sua rotação e escala.
+    \item Render: Renderiza uma textura, aplicando operação de rotação,
+    escala, transparência e a uma certa profundidade (coordenada Z do
+    Transform, utilizada para definir a ordem de precedência dos sprites).
+    \item Physics: Define se um objeto ou não será colidível e com quem
+    ele o será.
+\end{itemize}
+
+\subsection{Scanner de Arena}
+
+O propósito do Scanner de Arena é permitir que a mesma seja alterada dinamicamente durante
+o jogo, sem que isso proporcione atrasos (diminuição de frame rate). Usando o modo de
+câmera de cor, capturamos as imagens com resolução 640x480 a uma taxa de 30fps.
+
+A técnica de limiarização global utilizada está descrita no algorítmo \ref{alg:lg}. Percorrendo
+a matriz linearizada de pixels, projetamos o pixel atual no espaço de cores de tons de cinza. Se
+este pixel estiver abaixo de um determinado Threshold (escolhido empiricamente com base na iluminação
+do ambiente, influência de sombras e o gráu de destaque enter os objetos e o fundo - tipicamente branco),
+então marcamos ele como objeto (preto), caso contrário, fundo (branco). O resultado final é um vetor binário
+(0x0 ou 0xff). 
+
+\begin{algorithm}[H]
+\KwData{Imagem do Kinect linearizada, Threshold}
+ \KwResult{Vetor de objetos}
+ 
+ \For{cada pixel p na imagem} {
+    gs = (p.Red + p.Green + p.Blue) / 3
+    
+    \eIf{gs \leq Threshold} {
+        p = 0x0
+    } {
+        p = 0xff
+    }
+ }
+ \caption{Algorítmo de Limiarização Global}
+ \label{alg:lg}
+\end{algorithm}
+
+Com apenas uma passada é possível separar os objetos do fundo.
+
+\section{Resultados e Conclusão}
+
+\section{Projetos Futuros}
+
+{\small
+\bibliographystyle{unsrt}
+\bibliography{ref}
+}
+
+\end{document}
