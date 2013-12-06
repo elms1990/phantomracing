@@ -45,10 +45,6 @@ Realidade Aumentada:\\ Uma Abordagem Utilizando Kinect}
 
 %\hfill - \emph{Stephen King, The Gunslinger.}
 %\newpage
-
-\section{Resumo}
-
-
 \section{Introdução}
 O mercado de games é, atualmente, o ramo de entretenimento que mais gera receita,
 chegando a ultrapassar os lucros obtidos pela indústria cinematográfica
@@ -183,6 +179,53 @@ implementados:
     ele o será.
 \end{itemize}
 
+\subsection{Detecção e Resolução de Colisões}
+
+Dada a natureza do projeto, foram implementadas dois tipos de detecção: baseada em
+círculos e pixel a pixel. A primeira é aplicada na interação entre os jogadores e
+entre tiros e a segunda na interação entre os objetos virtuais e a arena física.
+Os Algorítmos \ref{alg:circ} e \ref{alg:pixel} descrevem o funcionamento da detecção
+da colisão circular e por pixel. Vale a ressalta de que a resolução do Kinect é
+diferente da resolução utilizada pelo jogo (respectivamente 640x840 e 1024x768),
+portanto aplicamos uma conversão de coordenadas do jogo para as coordenadas do Kinect.
+
+\begin{algorithm}[H]
+\KwData{Circulos c1 e c2}
+ \KwResult{Booleana}
+ \\
+ centro_1.x = c1.x + c1.radius\\
+ centro_1.y = c1.y + c1.radius\\
+ centro_2.x = c2.x + c2.radius\\
+ centro_2.y = c2.y + c2.radius\\
+ 
+ return \begin{math} (c1.radius + c2.radius)^2 \leq \sqrt{(centro_1.x - centro_2.x)^2 + (centro_1.y - centro_2.y)^2} \end{math}
+ 
+ \caption{Detecção de colisões circulares}
+ \label{alg:circ}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\KwData{Objeto o1, vetor de bytes v (arena)}
+ \KwResult{Booleana}
+
+
+\For{Para cada pixel p de o1} {
+    coord = Coordenadas projetadas de p em v.\\
+    \eIf{cor(coord) == 0 && alpha(p) \textgreater 0} {
+        return True
+    }
+}
+return False
+ 
+ \caption{Detecção de colisões pixel a pixel}
+ \label{alg:pixel}
+\end{algorithm}
+
+Analisando o Algorítmo \ref{alg:pixel}, percebemos que ele testa todos os pixels
+do sprite contra todos os pixels do vetor de bytes, retornando True assim que
+ele detectar que um pixel não-transparente do Sprite entrou em contato com um
+pixel não-fundo (preto) do vetor de bytes.
+
 \subsection{Scanner de Arena}
 
 O propósito do Scanner de Arena é permitir que a mesma seja alterada dinamicamente durante
@@ -199,8 +242,7 @@ então marcamos ele como objeto (preto), caso contrário, fundo (branco). O result
 \begin{algorithm}[H]
 \KwData{Imagem do Kinect linearizada, Threshold}
  \KwResult{Vetor de objetos}
- 
- \For{cada pixel p na imagem} {
+ \For{cada pixel p na imagem } {
     gs = (p.Red + p.Green + p.Blue) / 3
     
     \eIf{gs \leq Threshold} {
@@ -212,12 +254,35 @@ então marcamos ele como objeto (preto), caso contrário, fundo (branco). O result
  \caption{Algorítmo de Limiarização Global}
  \label{alg:lg}
 \end{algorithm}
-
-Com apenas uma passada é possível separar os objetos do fundo.
+\\
+Com apenas uma passada é possível separar os objetos do fundo. 
 
 \section{Resultados e Conclusão}
 
+Para efeito de demonstração, implementamos dois modos de jogo:
+
+\begin{itemize}
+    \item Deathmatch: Neste modo, os jogadores lutam entre si em um cenário
+    totalmente mutável, isto é, durante o meio da batalha a arena pode ser alterada
+    de forma arbitrária.
+    \item Destruction: O modo Destruction permite que a arena seja virtualizada apenas
+    uma única vez. As batalhas ocorrem da mesma maneira de sempre, porém o cenário
+    é destrutível. Quando um tiro acerta algum objeto físico, a região em torno do ponto
+    de colisão é removida. Com disparos o suficiente é possível destruir obstáculos inteiros,
+    criando novos pontos de passagem.
+\end{itemize}
+
+Ambos modos demonstram a flexibilidade da Game Engine, além do gameplay estável mesmo com
+operações pesadas como colisão pixel a pixel e processamento de imagem, provocando uma 
+sensação de maior interação com o jogo.
+
 \section{Projetos Futuros}
+
+Uma possível extensão seria projetar a imagem do jogo sobre a Arena física. Outra abordagem interessante
+incluí a utilização do sensor de profundidade do Kinect, pois desta maneira podemos detectar rampas e criar
+um cenário 2,5D. 
+Utilizando conceitos de reconhecimento de objetos, podemos atribuir funcionalidades específicas a alguns
+tipos de objetos, como o mapeamento entre uma tampa de garrafa e um item.
 
 {\small
 \bibliographystyle{unsrt}
